@@ -1,0 +1,84 @@
+[
+  {
+    "id": "1",
+    "nama": "Say Macaroni - Garlic Butter",
+    "varian_rasa": "Garlic Butter",
+    "level_pedas": [0, 1, 2, 3, 4, 5],
+    "harga": 25000,
+    "berat": "150g",
+    "stok_tampil": true,
+    "deskripsi": "Makaroni goreng renyah berpadu dengan gurihnya mentega premium dan aroma bawang putih asli yang harum. Sangat cocok untuk menemani waktu santai Anda. Bumbu merata dan tidak membuat serak di tenggorokan.",
+    "komposisi": "Makaroni gandum pilihan, minyak kelapa sawit, bawang putih segar, butter powder, garam, penyedap rasa nabati.",
+    "foto": [
+      "/images/garlic_butter_1.jpg",
+      "/images/garlic_butter_2.jpg"
+    ],
+    "kategori": "Best Seller",
+    "unggulan": true
+  },
+  {
+    "id": "2",
+    "nama": "Say Macaroni - Original Classic",
+    "varian_rasa": "Original",
+    "level_pedas": [0, 1, 2, 3, 4, 5],
+    "harga": 22000,
+    "berat": "150g",
+    "stok_tampil": true,
+    "deskripsi": "Varian rasa klasik asin gurih alami yang disukai semua kalangan. Menggunakan garam laut premium yang memberikan rasa asin pas dan gurih alami makaroni goreng berkualitas tinggi.",
+    "komposisi": "Makaroni gandum pilihan, minyak kelapa sawit, garam laut premium, penyedap rasa alami.",
+    "foto": [
+      "/images/original_1.jpg",
+      "/images/original_2.jpg"
+    ],
+    "kategori": "Classic",
+    "unggulan": true
+  },
+  {
+    "id": "3",
+    "nama": "Say Macaroni - Balado Daun Jeruk",
+    "varian_rasa": "Balado",
+    "level_pedas": [1, 2, 3, 4, 5],
+    "harga": 26000,
+    "berat": "150g",
+    "stok_tampil": true,
+    "deskripsi": "Perpaduan rasa manis, asam, dan pedas khas bumbu Balado yang diracik khusus dengan irisan daun jeruk segar. Menghasilkan aroma wangi jeruk yang menggugah selera di setiap gigitannya.",
+    "komposisi": "Makaroni gandum, minyak kelapa sawit, bubuk cabai merah asli, gula, garam, ekstrak daun jeruk purut segar.",
+    "foto": [
+      "/images/balado_jeruk_1.jpg"
+    ],
+    "kategori": "Spicy Fusion",
+    "unggulan": true
+  },
+  {
+    "id": "4",
+    "nama": "Say Macaroni - Keju Premium",
+    "varian_rasa": "Keju",
+    "level_pedas": [0, 1, 2, 3],
+    "harga": 27000,
+    "berat": "150g",
+    "stok_tampil": true,
+    "deskripsi": "Untuk para pencinta keju! Makaroni gurih berselimut bubuk keju cheddar premium yang tebal dan creamy. Menawarkan sensasi rasa gurih manis susu yang lumer di mulut.",
+    "komposisi": "Makaroni gandum, minyak kelapa sawit, bubuk keju cheddar impor, whey powder, garam.",
+    "foto": [
+      "/images/keju_premium_1.jpg"
+    ],
+    "kategori": "Cheese Lover",
+    "unggulan": false
+  },
+  {
+    "id": "5",
+    "nama": "Say Macaroni - Salted Egg Creamy",
+    "varian_rasa": "Salted Egg",
+    "level_pedas": [0, 1, 2, 3],
+    "harga": 28000,
+    "berat": "150g",
+    "stok_tampil": true,
+    "deskripsi": "Saus telur asin asli yang creamy dan gurih berpadu dengan daun kari segar dan sedikit cabai. Memberikan cita rasa premium kekinian yang unik, gurih, dan lezat tiada duanya.",
+    "komposisi": "Makaroni gandum, minyak kelapa sawit, kuning telur asin asli bubuk, susu bubuk, daun kari segar, garam.",
+    "foto": [
+      "/images/salted_egg_1.jpg"
+    ],
+    "kategori": "Specialty",
+    "unggulan": false
+  }
+]
