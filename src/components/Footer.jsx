@@ -10,7 +10,7 @@ const Footer = ({ setPage }) => {
   return (
     <footer
       style={{
-        backgroundColor: '#050811',
+        backgroundColor: 'var(--color-bg-footer)',
         borderTop: '1px solid var(--color-border)',
         padding: '60px 0 30px 0',
         marginTop: '80px',
@@ -62,11 +62,11 @@ const Footer = ({ setPage }) => {
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--color-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
+                  color: 'var(--color-text-main)',
                   border: '1px solid var(--color-border)',
                   transition: 'all 0.2s ease',
                 }}
@@ -82,11 +82,11 @@ const Footer = ({ setPage }) => {
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--color-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
+                  color: 'var(--color-text-main)',
                   border: '1px solid var(--color-border)',
                   transition: 'all 0.2s ease',
                 }}
@@ -99,7 +99,7 @@ const Footer = ({ setPage }) => {
 
           {/* Column 2: Navigation Links */}
           <div>
-            <h4 style={{ color: '#fff', marginBottom: '20px', fontFamily: 'var(--font-heading)' }}>Tautan Cepat</h4>
+            <h4 style={{ color: 'var(--color-text-main)', marginBottom: '20px', fontFamily: 'var(--font-heading)' }}>Tautan Cepat</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <button
@@ -142,19 +142,19 @@ const Footer = ({ setPage }) => {
 
           {/* Column 3: Jam Operasional */}
           <div>
-            <h4 style={{ color: '#fff', marginBottom: '20px', fontFamily: 'var(--font-heading)' }}>Jam Operasional</h4>
+            <h4 style={{ color: 'var(--color-text-main)', marginBottom: '20px', fontFamily: 'var(--font-heading)' }}>Jam Operasional</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <Clock size={18} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
                 <div>
-                  <span style={{ display: 'block', color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>Senin - Sabtu:</span>
+                  <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Senin - Sabtu:</span>
                   <span style={{ fontSize: '0.85rem' }}>09:00 - 21:00 WIB</span>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <Clock size={18} style={{ color: 'var(--color-spicy)', marginTop: '2px' }} />
                 <div>
-                  <span style={{ display: 'block', color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>Minggu / Hari Libur:</span>
+                  <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Minggu / Hari Libur:</span>
                   <span style={{ fontSize: '0.85rem' }}>10:00 - 17:00 WIB (Slow Response)</span>
                 </div>
               </div>
@@ -163,7 +163,7 @@ const Footer = ({ setPage }) => {
         </div>
 
         {/* Divider */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingMinutes: '20px', paddingTop: '24px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+        <div style={{ borderTop: '1px solid var(--color-border)', paddingMinutes: '20px', paddingTop: '24px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
           <p style={{ fontSize: '0.8rem' }}>
             &copy; {new Date().getFullYear()} Say! Macaroni. All Rights Reserved.
           </p>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingBag, Menu, X, Sparkles } from 'lucide-react';
+import { ShoppingBag, Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
 
-const Navbar = ({ currentPage, setPage }) => {
+const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
   const { getCartCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,7 +44,7 @@ const Navbar = ({ currentPage, setPage }) => {
         right: 0,
         zIndex: 1000,
         transition: 'all 0.3s ease',
-        background: isScrolled ? 'rgba(10, 15, 29, 0.9)' : 'transparent',
+        background: isScrolled ? 'var(--color-bg-nav)' : 'transparent',
         backdropFilter: isScrolled ? 'blur(12px)' : 'none',
         borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid transparent',
         padding: isScrolled ? '12px 0' : '20px 0',
@@ -114,8 +114,30 @@ const Navbar = ({ currentPage, setPage }) => {
           ))}
         </div>
 
-        {/* Action Buttons (Cart & Mobile Menu Trigger) */}
+        {/* Action Buttons (Cart, Theme Switcher & Mobile Menu Trigger) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Theme Switcher Button */}
+          <button
+            onClick={toggleTheme}
+            className="glass-panel"
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--color-border)',
+              padding: '10px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              color: 'var(--color-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+            }}
+            title={theme === 'light' ? 'Mode Gelap' : 'Mode Terang'}
+          >
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+
           {/* Cart Button */}
           <button
             onClick={() => handleNavClick('cart')}
@@ -127,11 +149,12 @@ const Navbar = ({ currentPage, setPage }) => {
               padding: '10px 14px',
               borderRadius: 'var(--radius-full)',
               cursor: 'pointer',
-              color: currentPage === 'cart' ? 'var(--color-primary)' : '#fff',
+              color: currentPage === 'cart' ? 'var(--color-primary)' : 'var(--color-text-main)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               fontWeight: 600,
+              height: '40px',
             }}
           >
             <ShoppingBag size={18} />
@@ -169,13 +192,15 @@ const Navbar = ({ currentPage, setPage }) => {
             style={{
               background: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid var(--color-border)',
-              color: '#fff',
+              color: 'var(--color-text-main)',
               padding: '10px',
               borderRadius: '50%',
               cursor: 'pointer',
               display: 'none',
               alignItems: 'center',
               justifyContent: 'center',
+              width: '40px',
+              height: '40px',
             }}
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

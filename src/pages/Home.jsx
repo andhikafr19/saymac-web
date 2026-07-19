@@ -231,7 +231,7 @@ const Home = ({ setPage, setSelectedProductId }) => {
               padding: '48px',
               position: 'relative',
               overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(10, 15, 29, 0.9) 0%, rgba(33, 158, 188, 0.15) 100%)',
+              background: 'linear-gradient(135deg, var(--color-bg-card) 0%, rgba(33, 158, 188, 0.15) 100%)',
               border: '1px solid rgba(255, 183, 3, 0.15)',
               boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
               display: 'grid',

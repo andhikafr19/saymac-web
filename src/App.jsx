@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -12,6 +12,23 @@ import Contact from './pages/Contact';
 const AppContent = () => {
   const [currentPage, setPage] = useState('home');
   const [selectedProductId, setSelectedProductId] = useState('1');
+  
+  // Theme State (Dark theme default, check localStorage first)
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) return savedTheme;
+    // Default to dark mode as it is the brand primary theme
+    return 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // Render current page view
   const renderPage = () => {
@@ -42,7 +59,12 @@ const AppContent = () => {
   return (
     <div className="app-container">
       {/* Navigation */}
-      <Navbar currentPage={currentPage} setPage={setPage} />
+      <Navbar 
+        currentPage={currentPage} 
+        setPage={setPage} 
+        theme={theme} 
+        toggleTheme={toggleTheme} 
+      />
 
       {/* Main Content Router */}
       <main className="main-content">
