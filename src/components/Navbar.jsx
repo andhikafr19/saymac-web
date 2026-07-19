@@ -65,12 +65,15 @@ const Navbar = ({ currentPage, setPage }) => {
             color: '#fff',
           }}
         >
-          <span style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}>
-            🍜
-          </span>
-          <span>
-            Say!<span style={{ color: 'var(--color-primary)' }}>Macaroni</span>
-          </span>
+          <img
+            src="/images/say_macaroni_logo-removebg.png"
+            alt="Say! Macaroni"
+            style={{
+              height: '42px',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
         </div>
 
         {/* Desktop Nav Links */}

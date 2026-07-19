@@ -40,8 +40,15 @@ const Footer = ({ setPage }) => {
                 marginBottom: '16px',
               }}
             >
-              <span style={{ color: 'var(--color-primary)' }}>🍜</span>
-              <span>Say!<span style={{ color: 'var(--color-primary)' }}>Macaroni</span></span>
+              <img
+                src="/images/say_macaroni_logo-removebg.png"
+                alt="Say! Macaroni"
+                style={{
+                  height: '42px',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
             </div>
             <p style={{ fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '20px' }}>
               Camilan makaroni goreng premium dengan rasa gurih juara, bumbu rempah pilihan, dan sensasi pedas yang bisa Anda sesuaikan sendiri. Nikmati kenikmatan kriuk sejati di setiap gigitannya!
