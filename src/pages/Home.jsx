@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAllProducts } from '../services/productService';
+import { fetchAllProducts, getPriceDisplay } from '../services/productService';
 import { Sparkles, ArrowRight, ShieldCheck, Flame, Award, ShoppingBag, Send } from 'lucide-react';
 
 const Home = ({ setPage, setSelectedProductId }) => {
@@ -222,7 +222,7 @@ const Home = ({ setPage, setSelectedProductId }) => {
                   <p className="product-desc" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>{product.deskripsi}</p>
                   <div className="product-footer">
                     <div>
-                      <span className="product-price">Rp {product.harga.toLocaleString('id-ID')}</span>
+                      <span className="product-price">{getPriceDisplay(product)}</span>
                       <span className="weight-info" style={{ display: 'block', marginTop: '2px' }}>Netto: {product.berat}</span>
                     </div>
                     <button

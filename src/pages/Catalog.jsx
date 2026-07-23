@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAllProducts } from '../services/productService';
+import { fetchAllProducts, getPriceDisplay } from '../services/productService';
 import { Search, Flame, Filter, HelpCircle, Loader2 } from 'lucide-react';
 
 const Catalog = ({ setPage, setSelectedProductId }) => {
@@ -191,7 +191,7 @@ const Catalog = ({ setPage, setSelectedProductId }) => {
                   <p className="product-desc" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>{product.deskripsi}</p>
                   <div className="product-footer">
                     <div>
-                      <span className="product-price">Rp {product.harga.toLocaleString('id-ID')}</span>
+                      <span className="product-price">{getPriceDisplay(product)}</span>
                       <span className="weight-info" style={{ display: 'block', marginTop: '2px' }}>Netto: {product.berat}</span>
                     </div>
                     <button

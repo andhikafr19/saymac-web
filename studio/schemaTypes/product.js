@@ -38,9 +38,48 @@ export default defineType({
     }),
     defineField({
       name: 'harga',
-      title: 'Harga (Rp)',
+      title: 'Harga Dasar / Mulai (Rp)',
       type: 'number',
       validation: (Rule) => Rule.required().min(0),
+    }),
+    defineField({
+      name: 'harga_level',
+      title: 'Harga per Level Pedas (Opsional)',
+      type: 'array',
+      description: 'Atur harga khusus untuk level pedas tertentu. Jika kosong, akan menggunakan Harga Dasar.',
+      of: [
+        defineField({
+          name: 'levelHargaItem',
+          title: 'Level & Harga',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'level',
+              title: 'Level Pedas',
+              type: 'number',
+              validation: (Rule) => Rule.required().min(0).max(5),
+            }),
+            defineField({
+              name: 'harga',
+              title: 'Harga Spesifik (Rp)',
+              type: 'number',
+              validation: (Rule) => Rule.required().min(0),
+            }),
+          ],
+          preview: {
+            select: {
+              level: 'level',
+              harga: 'harga',
+            },
+            prepare({ level, harga }) {
+              return {
+                title: `Level ${level}`,
+                subtitle: `Rp ${Number(harga || 0).toLocaleString('id-ID')}`,
+              };
+            },
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'berat',

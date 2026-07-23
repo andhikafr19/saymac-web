@@ -14,13 +14,20 @@ function normalizeProduct(p) {
     ? p.foto
     : ['/images/placeholder.jpg'];
 
+  const rawHargaLevel = Array.isArray(p.harga_level) ? p.harga_level : [];
+  const harga_level = rawHargaLevel.map(item => ({
+    level: Number(item.level),
+    harga: Number(item.harga),
+  }));
+
   return {
     id: p._id || p.id,
     nama: p.nama || '',
     slug: p.slug?.current || p.slug || p.id,
     varian_rasa: p.varian_rasa || '',
     level_pedas: Array.isArray(p.level_pedas) ? p.level_pedas : [0, 1, 2, 3, 4, 5],
-    harga: p.harga || 0,
+    harga: Number(p.harga || 0),
+    harga_level,
     berat: p.berat || '150g',
     stok_tampil: p.stok_tampil !== undefined ? p.stok_tampil : true,
     deskripsi: p.deskripsi || '',
@@ -29,6 +36,33 @@ function normalizeProduct(p) {
     kategori: p.kategori || 'Umum',
     unggulan: Boolean(p.unggulan),
   };
+}
+
+export function getProductPriceForLevel(product, level) {
+  if (!product) return 0;
+  if (Array.isArray(product.harga_level) && product.harga_level.length > 0) {
+    const found = product.harga_level.find(item => Number(item.level) === Number(level));
+    if (found && typeof found.harga === 'number' && found.harga > 0) {
+      return found.harga;
+    }
+  }
+  return product.harga || 0;
+}
+
+export function getPriceDisplay(product) {
+  if (!product) return 'Rp 0';
+  if (Array.isArray(product.harga_level) && product.harga_level.length > 0) {
+    const prices = product.harga_level.map(item => item.harga).filter(h => h > 0);
+    if (prices.length > 0) {
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      if (minPrice !== maxPrice) {
+        return `Mulai Rp ${minPrice.toLocaleString('id-ID')}`;
+      }
+      return `Rp ${minPrice.toLocaleString('id-ID')}`;
+    }
+  }
+  return `Rp ${(product.harga || 0).toLocaleString('id-ID')}`;
 }
 
 export async function fetchAllProducts() {
@@ -40,6 +74,7 @@ export async function fetchAllProducts() {
       varian_rasa,
       level_pedas,
       harga,
+      harga_level,
       berat,
       stok_tampil,
       deskripsi,
@@ -67,6 +102,7 @@ export async function fetchProductByIdOrSlug(idOrSlug) {
       varian_rasa,
       level_pedas,
       harga,
+      harga_level,
       berat,
       stok_tampil,
       deskripsi,

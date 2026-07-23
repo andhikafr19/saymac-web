@@ -26,7 +26,8 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems]);
 
-  const addToCart = (product, quantity, selectedSpicyLevel) => {
+  const addToCart = (product, quantity, selectedSpicyLevel, customPrice) => {
+    const finalPrice = typeof customPrice === 'number' && customPrice > 0 ? customPrice : product.harga;
     setCartItems((prevItems) => {
       const cartItemId = `${product.id}-${selectedSpicyLevel}`;
       const existingItemIndex = prevItems.findIndex((item) => item.cartItemId === cartItemId);
@@ -34,6 +35,8 @@ export const CartProvider = ({ children }) => {
       if (existingItemIndex > -1) {
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += quantity;
+        // Update price in case it changed or to ensure exact level price
+        updatedItems[existingItemIndex].harga = finalPrice;
         return updatedItems;
       } else {
         return [
@@ -44,7 +47,7 @@ export const CartProvider = ({ children }) => {
             nama: product.nama,
             varian_rasa: product.varian_rasa,
             level_pedas: selectedSpicyLevel,
-            harga: product.harga,
+            harga: finalPrice,
             berat: product.berat,
             foto: product.foto[0],
             quantity: quantity,

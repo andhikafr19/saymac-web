@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProductByIdOrSlug, fetchAllProducts } from '../services/productService';
+import { fetchProductByIdOrSlug, fetchAllProducts, getProductPriceForLevel } from '../services/productService';
 import { useCart } from '../context/CartContext';
 import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check, Loader2 } from 'lucide-react';
 
@@ -63,8 +63,10 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
     );
   }
 
+  const activePrice = getProductPriceForLevel(product, selectedSpice);
+
   const handleAddToCart = () => {
-    addToCart(product, qty, selectedSpice);
+    addToCart(product, qty, selectedSpice, activePrice);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
@@ -194,8 +196,11 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
                 </span>
               </div>
               <h1 style={{ fontSize: '2.2rem', fontWeight: 800 }}>{product.nama}</h1>
-              <div style={{ color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 800, marginTop: '8px' }}>
-                Rp {product.harga.toLocaleString('id-ID')}
+              <div style={{ color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 800, marginTop: '8px', display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <span>Rp {activePrice.toLocaleString('id-ID')}</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                  (Harga Level {selectedSpice})
+                </span>
               </div>
             </div>
 
@@ -221,6 +226,7 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {product.level_pedas.map((lvl) => {
                   const isSelected = selectedSpice === lvl;
+                  const lvlPrice = getProductPriceForLevel(product, lvl);
                   return (
                     <button
                       key={lvl}
@@ -236,19 +242,25 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
                         fontSize: '0.9rem',
                         transition: 'all 0.2s',
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: '2px',
                       }}
                       className="spice-hover"
                     >
-                      {lvl === 0 ? 'Lvl 0 (Tanpa Pedas)' : `Level ${lvl}`}
-                      {lvl > 0 && (
-                        <div style={{ display: 'flex', gap: '1px' }}>
-                          {Array.from({ length: Math.min(lvl, 3) }).map((_, i) => (
-                            <Flame key={i} size={12} fill={isSelected ? 'white' : 'var(--color-spicy)'} stroke="none" />
-                          ))}
-                        </div>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {lvl === 0 ? 'Lvl 0 (Tanpa Pedas)' : `Level ${lvl}`}
+                        {lvl > 0 && (
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            {Array.from({ length: Math.min(lvl, 3) }).map((_, i) => (
+                              <Flame key={i} size={12} fill={isSelected ? 'white' : 'var(--color-spicy)'} stroke="none" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <span style={{ fontSize: '0.75rem', opacity: isSelected ? 0.9 : 0.7, fontWeight: 600 }}>
+                        Rp {lvlPrice.toLocaleString('id-ID')}
+                      </span>
                     </button>
                   );
                 })}
