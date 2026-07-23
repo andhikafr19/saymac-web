@@ -1,8 +1,26 @@
-import React from 'react';
-import productsData from '../data/products.json';
+import React, { useState, useEffect } from 'react';
+import { fetchAllProducts, getPriceDisplay } from '../services/productService';
 import { Sparkles, ArrowRight, ShieldCheck, Flame, Award, ShoppingBag, Send } from 'lucide-react';
 
 const Home = ({ setPage, setSelectedProductId }) => {
+  const [productsData, setProductsData] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProducts() {
+      try {
+        const data = await fetchAllProducts();
+        if (isMounted) {
+          setProductsData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching home products:', err);
+      }
+    }
+    loadProducts();
+    return () => { isMounted = false; };
+  }, []);
+
   const featuredProducts = productsData.filter((p) => p.unggulan && p.stok_tampil).slice(0, 3);
 
   const handleProductClick = (id) => {
@@ -204,7 +222,7 @@ const Home = ({ setPage, setSelectedProductId }) => {
                   <p className="product-desc" style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '16px' }}>{product.deskripsi}</p>
                   <div className="product-footer">
                     <div>
-                      <span className="product-price">Rp {product.harga.toLocaleString('id-ID')}</span>
+                      <span className="product-price">{getPriceDisplay(product)}</span>
                       <span className="weight-info" style={{ display: 'block', marginTop: '2px' }}>Netto: {product.berat}</span>
                     </div>
                     <button

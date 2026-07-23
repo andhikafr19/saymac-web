@@ -5,6 +5,14 @@
     "varian_rasa": "Garlic Butter",
     "level_pedas": [0, 1, 2, 3, 4, 5],
     "harga": 25000,
+    "harga_level": [
+      { "level": 0, "harga": 25000 },
+      { "level": 1, "harga": 25000 },
+      { "level": 2, "harga": 26000 },
+      { "level": 3, "harga": 27000 },
+      { "level": 4, "harga": 28000 },
+      { "level": 5, "harga": 30000 }
+    ],
     "berat": "150g",
     "stok_tampil": true,
     "deskripsi": "Makaroni goreng renyah berpadu dengan gurihnya mentega premium dan aroma bawang putih asli yang harum. Sangat cocok untuk menemani waktu santai Anda. Bumbu merata dan tidak membuat serak di tenggorokan.",
@@ -22,6 +30,14 @@
     "varian_rasa": "Original",
     "level_pedas": [0, 1, 2, 3, 4, 5],
     "harga": 22000,
+    "harga_level": [
+      { "level": 0, "harga": 22000 },
+      { "level": 1, "harga": 22000 },
+      { "level": 2, "harga": 23000 },
+      { "level": 3, "harga": 24000 },
+      { "level": 4, "harga": 25000 },
+      { "level": 5, "harga": 27000 }
+    ],
     "berat": "150g",
     "stok_tampil": true,
     "deskripsi": "Varian rasa klasik asin gurih alami yang disukai semua kalangan. Menggunakan garam laut premium yang memberikan rasa asin pas dan gurih alami makaroni goreng berkualitas tinggi.",
@@ -39,6 +55,13 @@
     "varian_rasa": "Balado",
     "level_pedas": [1, 2, 3, 4, 5],
     "harga": 26000,
+    "harga_level": [
+      { "level": 1, "harga": 26000 },
+      { "level": 2, "harga": 26000 },
+      { "level": 3, "harga": 28000 },
+      { "level": 4, "harga": 29000 },
+      { "level": 5, "harga": 31000 }
+    ],
     "berat": "150g",
     "stok_tampil": true,
     "deskripsi": "Perpaduan rasa manis, asam, dan pedas khas bumbu Balado yang diracik khusus dengan irisan daun jeruk segar. Menghasilkan aroma wangi jeruk yang menggugah selera di setiap gigitannya.",
@@ -55,6 +78,12 @@
     "varian_rasa": "Keju",
     "level_pedas": [0, 1, 2, 3],
     "harga": 27000,
+    "harga_level": [
+      { "level": 0, "harga": 27000 },
+      { "level": 1, "harga": 27000 },
+      { "level": 2, "harga": 28000 },
+      { "level": 3, "harga": 29000 }
+    ],
     "berat": "150g",
     "stok_tampil": true,
     "deskripsi": "Untuk para pencinta keju! Makaroni gurih berselimut bubuk keju cheddar premium yang tebal dan creamy. Menawarkan sensasi rasa gurih manis susu yang lumer di mulut.",
@@ -71,6 +100,12 @@
     "varian_rasa": "Salted Egg",
     "level_pedas": [0, 1, 2, 3],
     "harga": 28000,
+    "harga_level": [
+      { "level": 0, "harga": 28000 },
+      { "level": 1, "harga": 28000 },
+      { "level": 2, "harga": 29500 },
+      { "level": 3, "harga": 31000 }
+    ],
     "berat": "150g",
     "stok_tampil": true,
     "deskripsi": "Saus telur asin asli yang creamy dan gurih berpadu dengan daun kari segar dan sedikit cabai. Memberikan cita rasa premium kekinian yang unik, gurih, dan lezat tiada duanya.",

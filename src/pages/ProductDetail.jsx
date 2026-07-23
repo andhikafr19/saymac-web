@@ -1,11 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import productsData from '../data/products.json';
+import { fetchProductByIdOrSlug, fetchAllProducts, getProductPriceForLevel } from '../services/productService';
 import { useCart } from '../context/CartContext';
-import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check } from 'lucide-react';
+import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check, Loader2 } from 'lucide-react';
 
 const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
   const { addToCart } = useCart();
-  const product = productsData.find((p) => p.id === productId);
+  const [product, setProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [activeImage, setActiveImage] = useState('');
+  const [selectedSpice, setSelectedSpice] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      setLoading(true);
+      try {
+        const targetProduct = await fetchProductByIdOrSlug(productId);
+        const list = await fetchAllProducts();
+        if (isMounted) {
+          setProduct(targetProduct);
+          setAllProducts(list);
+          if (targetProduct) {
+            setActiveImage(targetProduct.foto?.[0] || '');
+            setSelectedSpice(targetProduct.level_pedas?.[0] ?? 0);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching product details:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadData();
+    setQty(1);
+    setIsAdded(false);
+    return () => { isMounted = false; };
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '80px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <Loader2 className="animate-spin" size={36} style={{ color: 'var(--color-primary)' }} />
+        <p style={{ color: 'var(--color-text-muted)' }}>Memuat detail produk...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -18,21 +63,10 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
     );
   }
 
-  const [activeImage, setActiveImage] = useState(product.foto[0]);
-  const [selectedSpice, setSelectedSpice] = useState(product.level_pedas[0]);
-  const [qty, setQty] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
-
-  useEffect(() => {
-    // Reset page states when product changes
-    setActiveImage(product.foto[0]);
-    setSelectedSpice(product.level_pedas[0]);
-    setQty(1);
-    setIsAdded(false);
-  }, [product]);
+  const activePrice = getProductPriceForLevel(product, selectedSpice);
 
   const handleAddToCart = () => {
-    addToCart(product, qty, selectedSpice);
+    addToCart(product, qty, selectedSpice, activePrice);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
@@ -45,9 +79,10 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
   };
 
   // Get related products (same category or general products except current)
-  const relatedProducts = productsData
+  const relatedProducts = allProducts
     .filter((p) => p.id !== product.id && p.stok_tampil)
     .slice(0, 3);
+
 
   return (
     <div className="animate-fade-in" style={{ padding: '40px 0' }}>
@@ -161,8 +196,11 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
                 </span>
               </div>
               <h1 style={{ fontSize: '2.2rem', fontWeight: 800 }}>{product.nama}</h1>
-              <div style={{ color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 800, marginTop: '8px' }}>
-                Rp {product.harga.toLocaleString('id-ID')}
+              <div style={{ color: 'var(--color-primary)', fontSize: '2rem', fontWeight: 800, marginTop: '8px', display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <span>Rp {activePrice.toLocaleString('id-ID')}</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                  (Harga Level {selectedSpice})
+                </span>
               </div>
             </div>
 
@@ -188,6 +226,7 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {product.level_pedas.map((lvl) => {
                   const isSelected = selectedSpice === lvl;
+                  const lvlPrice = getProductPriceForLevel(product, lvl);
                   return (
                     <button
                       key={lvl}
@@ -203,19 +242,25 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
                         fontSize: '0.9rem',
                         transition: 'all 0.2s',
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: '2px',
                       }}
                       className="spice-hover"
                     >
-                      {lvl === 0 ? 'Lvl 0 (Tanpa Pedas)' : `Level ${lvl}`}
-                      {lvl > 0 && (
-                        <div style={{ display: 'flex', gap: '1px' }}>
-                          {Array.from({ length: Math.min(lvl, 3) }).map((_, i) => (
-                            <Flame key={i} size={12} fill={isSelected ? 'white' : 'var(--color-spicy)'} stroke="none" />
-                          ))}
-                        </div>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {lvl === 0 ? 'Lvl 0 (Tanpa Pedas)' : `Level ${lvl}`}
+                        {lvl > 0 && (
+                          <div style={{ display: 'flex', gap: '1px' }}>
+                            {Array.from({ length: Math.min(lvl, 3) }).map((_, i) => (
+                              <Flame key={i} size={12} fill={isSelected ? 'white' : 'var(--color-spicy)'} stroke="none" />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <span style={{ fontSize: '0.75rem', opacity: isSelected ? 0.9 : 0.7, fontWeight: 600 }}>
+                        Rp {lvlPrice.toLocaleString('id-ID')}
+                      </span>
                     </button>
                   );
                 })}

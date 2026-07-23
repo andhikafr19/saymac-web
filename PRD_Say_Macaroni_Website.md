@@ -51,8 +51,8 @@ Say Macaroni adalah brand makanan ringan berupa makaroni goreng dengan berbagai 
 1. Pengunjung membuka website (dari link di bio Instagram/WhatsApp/Google).
 2. Melihat halaman utama → klik "Lihat Katalog" atau langsung scroll produk unggulan.
 3. Masuk ke halaman katalog, bisa filter/sortir berdasarkan varian rasa atau level pedas.
-4. Klik salah satu produk → masuk ke halaman detail (foto, deskripsi, harga, berat, level pedas, tombol jumlah/qty).
-5. Klik "Tambah ke Keranjang" → produk masuk cart (badge jumlah item di ikon cart bertambah).
+4. Klik salah satu produk → masuk ke halaman detail (foto, deskripsi, harga dinamis per level pedas, berat, pemilih level pedas, tombol jumlah/qty). Memilih level pedas akan memperbarui harga produk secara real-time.
+5. Klik "Tambah ke Keranjang" → produk beserta level pedas dan harga spesifik level tersebut masuk cart (badge jumlah item di ikon cart bertambah).
 6. Bisa lanjut belanja produk lain, atau langsung klik ikon cart untuk melihat ringkasan.
 7. Di halaman cart: bisa ubah jumlah, hapus item, lihat estimasi total harga.
 8. Klik "Pesan via WhatsApp" → sistem generate teks pesanan otomatis → membuka WhatsApp (app/web) dengan nomor Admin Say Macaroni dan pesan sudah terisi otomatis.
@@ -65,10 +65,10 @@ Contoh template yang digenerate sistem (URL-encoded ke `wa.me`):
 ```
 Halo Say Macaroni, saya ingin memesan:
 
-1. Say Macaroni - Garlic (Level Pedas 2) x2 = Rp 50.000
+1. Say Macaroni - Garlic (Level Pedas 2) x2 = Rp 52.000
 2. Say Macaroni - Original (Level Pedas 0) x1 = Rp 22.000
 
-Total: Rp 72.000
+Total: Rp 74.000
 
 Nama: -
 Alamat: -
@@ -83,27 +83,27 @@ Catatan: Nama/Alamat/Catatan bisa dikosongkan agar pembeli mengisi manual di cha
 
 ### 7.1 Halaman Utama (Home)
 - Hero section dengan logo, tagline, dan foto produk
-- Section "Produk Unggulan" (highlight beberapa varian)
+- Section "Produk Unggulan" (highlight beberapa varian, menampilkan harga dasar/mulai)
 - Section promo/tema musiman (contoh: banner Ramadhan seperti pada referensi gambar yang dikirim)
 - CTA ke halaman katalog dan ke WhatsApp langsung (untuk pertanyaan umum)
 
 ### 7.2 Halaman Katalog Produk
-- Grid produk menampilkan: foto, nama produk, varian rasa, level pedas (ikon cabai), harga, berat kemasan
+- Grid produk menampilkan: foto, nama produk, varian rasa, level pedas (ikon cabai), harga dasar / kisaran harga ("Mulai Rp XX.XXX"), berat kemasan
 - Filter/kategori: berdasarkan rasa, level pedas, atau jenis kemasan
 - Search bar (opsional, jika jumlah produk sudah banyak)
 
 ### 7.3 Halaman Detail Produk
 - Galeri foto produk
-- Nama produk, deskripsi, komposisi/bahan (opsional), berat, harga
-- Indikator level pedas (visual, sesuai gaya kemasan: ikon cabai)
+- Nama produk, deskripsi, komposisi/bahan (opsional), berat, harga yang menyesuaikan secara real-time dengan level pedas yang dipilih
+- Indikator & pemilih level pedas (visual ikon cabai + informasi harga per level)
 - Input jumlah (qty stepper)
-- Tombol "Tambah ke Keranjang"
+- Tombol "Tambah ke Keranjang" (menyimpan item dengan harga level pedas terkait)
 - Produk terkait (related products)
 
 ### 7.4 Keranjang (Cart)
-- Daftar item yang dipilih (foto, nama, varian, qty, subtotal)
+- Daftar item yang dipilih (foto, nama, varian, level pedas, harga spesifik level, qty, subtotal)
 - Bisa edit qty atau hapus item
-- Menampilkan total estimasi harga
+- Menampilkan total estimasi harga berdasarkan level pedas item
 - Tombol "Pesan via WhatsApp" (aksi utama)
 - Cart disimpan di local storage browser (bertahan meski browser ditutup, tapi tidak lintas device)
 
@@ -138,13 +138,16 @@ Untuk tahap awal, ada dua opsi realistis:
 | id | string/number | ID unik produk |
 | nama | string | Nama produk, misal "Say Macaroni - Garlic" |
 | varian_rasa | string | Garlic, Original, Balado, dll |
-| level_pedas | number (0–5) | Sesuai indikator ikon cabai di kemasan |
-| harga | number | Harga jual |
-| berat | string | Contoh: 100g, 250g |
+| level_pedas | array of numbers | Pilihan level pedas yang tersedia (0–5) |
+| harga | number | Harga dasar / harga mulai jual |
+| harga_level | array of objects `{ level, harga }` | Pengaturan harga khusus per level pedas (opsional) |
+| berat | string | Contoh: 150g, 250g |
 | stok_tampil | boolean | Untuk sembunyikan produk yang sedang habis |
 | deskripsi | text | Deskripsi produk |
-| foto | array of image URL | Foto produk (bisa lebih dari 1) |
-| kategori | string | Untuk keperluan filter (opsional) |
+| komposisi | text | Bahan utama produk |
+| foto | array of image URL / Sanity Image | Foto produk (bisa lebih dari 1) |
+| kategori | string | Kategori produk (Best Seller, Classic, Spicy Fusion, dll) |
+| unggulan | boolean | Penanda produk unggulan untuk banner Home |
 
 ## 10. Rekomendasi Teknologi (Tech Stack)
 
