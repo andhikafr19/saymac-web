@@ -1,11 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import productsData from '../data/products.json';
+import { fetchProductByIdOrSlug, fetchAllProducts } from '../services/productService';
 import { useCart } from '../context/CartContext';
-import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check } from 'lucide-react';
+import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check, Loader2 } from 'lucide-react';
 
 const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
   const { addToCart } = useCart();
-  const product = productsData.find((p) => p.id === productId);
+  const [product, setProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [activeImage, setActiveImage] = useState('');
+  const [selectedSpice, setSelectedSpice] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      setLoading(true);
+      try {
+        const targetProduct = await fetchProductByIdOrSlug(productId);
+        const list = await fetchAllProducts();
+        if (isMounted) {
+          setProduct(targetProduct);
+          setAllProducts(list);
+          if (targetProduct) {
+            setActiveImage(targetProduct.foto?.[0] || '');
+            setSelectedSpice(targetProduct.level_pedas?.[0] ?? 0);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching product details:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadData();
+    setQty(1);
+    setIsAdded(false);
+    return () => { isMounted = false; };
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '80px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <Loader2 className="animate-spin" size={36} style={{ color: 'var(--color-primary)' }} />
+        <p style={{ color: 'var(--color-text-muted)' }}>Memuat detail produk...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -17,19 +62,6 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
       </div>
     );
   }
-
-  const [activeImage, setActiveImage] = useState(product.foto[0]);
-  const [selectedSpice, setSelectedSpice] = useState(product.level_pedas[0]);
-  const [qty, setQty] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
-
-  useEffect(() => {
-    // Reset page states when product changes
-    setActiveImage(product.foto[0]);
-    setSelectedSpice(product.level_pedas[0]);
-    setQty(1);
-    setIsAdded(false);
-  }, [product]);
 
   const handleAddToCart = () => {
     addToCart(product, qty, selectedSpice);
@@ -45,9 +77,10 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
   };
 
   // Get related products (same category or general products except current)
-  const relatedProducts = productsData
+  const relatedProducts = allProducts
     .filter((p) => p.id !== product.id && p.stok_tampil)
     .slice(0, 3);
+
 
   return (
     <div className="animate-fade-in" style={{ padding: '40px 0' }}>

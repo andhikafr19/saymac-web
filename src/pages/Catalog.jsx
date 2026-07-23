@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
-import productsData from '../data/products.json';
-import { Search, Flame, Filter, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { fetchAllProducts } from '../services/productService';
+import { Search, Flame, Filter, HelpCircle, Loader2 } from 'lucide-react';
 
 const Catalog = ({ setPage, setSelectedProductId }) => {
+  const [productsData, setProductsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [selectedSpiceFilter, setSelectedSpiceFilter] = useState('Semua'); // 'Semua', '0', '1-3', '4-5'
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProducts() {
+      try {
+        const data = await fetchAllProducts();
+        if (isMounted) {
+          setProductsData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+    loadProducts();
+    return () => { isMounted = false; };
+  }, []);
 
   const categories = ['Semua', 'Best Seller', 'Classic', 'Spicy Fusion', 'Cheese Lover', 'Specialty'];
 
@@ -143,7 +165,12 @@ const Catalog = ({ setPage, setSelectedProductId }) => {
         </div>
 
         {/* Catalog Grid */}
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <Loader2 className="animate-spin" size={36} style={{ color: 'var(--color-primary)' }} />
+            <p style={{ color: 'var(--color-text-muted)' }}>Memuat katalog produk...</p>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid-layout">
             {filteredProducts.map((product) => (
               <div

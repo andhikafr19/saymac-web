@@ -1,8 +1,26 @@
-import React from 'react';
-import productsData from '../data/products.json';
+import React, { useState, useEffect } from 'react';
+import { fetchAllProducts } from '../services/productService';
 import { Sparkles, ArrowRight, ShieldCheck, Flame, Award, ShoppingBag, Send } from 'lucide-react';
 
 const Home = ({ setPage, setSelectedProductId }) => {
+  const [productsData, setProductsData] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProducts() {
+      try {
+        const data = await fetchAllProducts();
+        if (isMounted) {
+          setProductsData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching home products:', err);
+      }
+    }
+    loadProducts();
+    return () => { isMounted = false; };
+  }, []);
+
   const featuredProducts = productsData.filter((p) => p.unggulan && p.stok_tampil).slice(0, 3);
 
   const handleProductClick = (id) => {
