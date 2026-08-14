@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CartProvider } from './context/CartContext';
+import { useSEO } from './hooks/useSEO';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -9,15 +10,71 @@ import Cart from './pages/Cart';
 import About from './pages/About';
 import Contact from './pages/Contact';
 
+const HASH_PAGE_MAP = {
+  '#katalog': 'catalog',
+  '#tentang': 'about',
+  '#kontak': 'contact',
+  '#keranjang': 'cart',
+  '#home': 'home',
+};
+
+const PAGE_HASH_MAP = {
+  home: '',
+  catalog: '#katalog',
+  about: '#tentang',
+  contact: '#kontak',
+  cart: '#keranjang',
+  detail: '#detail',
+};
+
 const AppContent = () => {
-  const [currentPage, setPage] = useState('home');
-  const [selectedProductId, setSelectedProductId] = useState('1');
-  
+  // Initialize page state from URL hash
+  const getInitialPageState = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#produk-')) {
+      return { page: 'detail', productId: hash.replace('#produk-', '') };
+    }
+    return { page: HASH_PAGE_MAP[hash] || 'home', productId: '1' };
+  };
+
+  const [currentPage, setCurrentPageState] = useState(() => getInitialPageState().page);
+  const [selectedProductId, setSelectedProductId] = useState(() => getInitialPageState().productId);
+
+  // Apply SEO dynamic meta tag hook
+  useSEO(currentPage);
+
+  const navigateToPage = useCallback((newPage, productId = null) => {
+    setCurrentPageState(newPage);
+    if (productId) {
+      setSelectedProductId(productId);
+      window.location.hash = `#produk-${productId}`;
+    } else {
+      const newHash = PAGE_HASH_MAP[newPage] || '';
+      if (window.location.hash !== newHash) {
+        if (newHash === '') {
+          history.pushState('', document.title, window.location.pathname + window.location.search);
+        } else {
+          window.location.hash = newHash;
+        }
+      }
+    }
+  }, []);
+
+  // Listen for browser back/forward navigation or hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { page, productId } = getInitialPageState();
+      setCurrentPageState(page);
+      if (productId) setSelectedProductId(productId);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   // Theme State (Dark theme default, check localStorage first)
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) return savedTheme;
-    // Default to dark mode as it is the brand primary theme
     return 'dark';
   });
 
@@ -34,25 +91,25 @@ const AppContent = () => {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home setPage={setPage} setSelectedProductId={setSelectedProductId} />;
+        return <Home setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
       case 'catalog':
-        return <Catalog setPage={setPage} setSelectedProductId={setSelectedProductId} />;
+        return <Catalog setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
       case 'detail':
         return (
           <ProductDetail
             productId={selectedProductId}
-            setPage={setPage}
+            setPage={navigateToPage}
             setSelectedProductId={setSelectedProductId}
           />
         );
       case 'cart':
-        return <Cart setPage={setPage} />;
+        return <Cart setPage={navigateToPage} />;
       case 'about':
-        return <About setPage={setPage} />;
+        return <About setPage={navigateToPage} />;
       case 'contact':
         return <Contact />;
       default:
-        return <Home setPage={setPage} setSelectedProductId={setSelectedProductId} />;
+        return <Home setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
     }
   };
 
@@ -61,7 +118,7 @@ const AppContent = () => {
       {/* Navigation */}
       <Navbar 
         currentPage={currentPage} 
-        setPage={setPage} 
+        setPage={navigateToPage} 
         theme={theme} 
         toggleTheme={toggleTheme} 
       />
@@ -72,7 +129,7 @@ const AppContent = () => {
       </main>
 
       {/* Footer */}
-      <Footer setPage={setPage} />
+      <Footer setPage={navigateToPage} />
     </div>
   );
 };

@@ -102,40 +102,44 @@ const Footer = ({ setPage }) => {
             <h4 style={{ color: 'var(--color-text-main)', marginBottom: '20px', fontFamily: 'var(--font-heading)' }}>Tautan Cepat</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
-                <button
-                  onClick={() => handleNav('home')}
-                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s' }}
+                <a
+                  href="/"
+                  onClick={(e) => { e.preventDefault(); handleNav('home'); }}
+                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s', textDecoration: 'none' }}
                   className="footer-link"
                 >
                   Halaman Utama
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('catalog')}
-                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s' }}
+                <a
+                  href="#katalog"
+                  onClick={(e) => { e.preventDefault(); handleNav('catalog'); }}
+                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s', textDecoration: 'none' }}
                   className="footer-link"
                 >
                   Katalog Produk
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('about')}
-                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s' }}
+                <a
+                  href="#tentang"
+                  onClick={(e) => { e.preventDefault(); handleNav('about'); }}
+                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s', textDecoration: 'none' }}
                   className="footer-link"
                 >
                   Tentang Kami
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => handleNav('contact')}
-                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s' }}
+                <a
+                  href="#kontak"
+                  onClick={(e) => { e.preventDefault(); handleNav('contact'); }}
+                  style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', transition: 'color 0.2s', textDecoration: 'none' }}
                   className="footer-link"
                 >
                   Hubungi Kami
-                </button>
+                </a>
               </li>
             </ul>
           </div>
