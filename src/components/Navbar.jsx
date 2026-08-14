@@ -20,10 +20,10 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', value: 'home' },
-    { name: 'Katalog', value: 'catalog' },
-    { name: 'Tentang Kami', value: 'about' },
-    { name: 'Hubungi Kami', value: 'contact' },
+    { name: 'Home', value: 'home', hash: '/' },
+    { name: 'Katalog', value: 'catalog', hash: '#katalog' },
+    { name: 'Tentang Kami', value: 'about', hash: '#tentang' },
+    { name: 'Hubungi Kami', value: 'contact', hash: '#kontak' },
   ];
 
   const handleNavClick = (page) => {
@@ -52,8 +52,12 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}
-        <div
-          onClick={() => handleNavClick('home')}
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNavClick('home');
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -63,6 +67,7 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
             fontWeight: 800,
             fontSize: '1.4rem',
             color: '#fff',
+            textDecoration: 'none',
           }}
         >
           <img
@@ -74,14 +79,18 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
               display: 'block',
             }}
           />
-        </div>
+        </a>
 
         {/* Desktop Nav Links */}
         <div className="desktop-links" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           {navLinks.map((link) => (
-            <button
+            <a
               key={link.value}
-              onClick={() => handleNavClick(link.value)}
+              href={link.hash}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick(link.value);
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -93,6 +102,7 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
                 transition: 'color 0.2s ease',
                 position: 'relative',
                 padding: '4px 0',
+                textDecoration: 'none',
               }}
               className="nav-link-hover"
             >
@@ -110,7 +120,7 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
                   }}
                 />
               )}
-            </button>
+            </a>
           ))}
         </div>
 
@@ -228,9 +238,13 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
           }}
         >
           {navLinks.map((link) => (
-            <button
+            <a
               key={link.value}
-              onClick={() => handleNavClick(link.value)}
+              href={link.hash}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick(link.value);
+              }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -242,10 +256,11 @@ const Navbar = ({ currentPage, setPage, theme, toggleTheme }) => {
                 padding: '8px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                 cursor: 'pointer',
+                textDecoration: 'none',
               }}
             >
               {link.name}
-            </button>
+            </a>
           ))}
         </div>
       )}
