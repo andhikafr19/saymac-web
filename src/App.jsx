@@ -32,9 +32,10 @@ const AppContent = () => {
   const getInitialPageState = () => {
     const hash = window.location.hash;
     if (hash.startsWith('#produk-')) {
-      return { page: 'detail', productId: hash.replace('#produk-', '') };
+      const id = hash.replace('#produk-', '');
+      return { page: 'detail', productId: id || null };
     }
-    return { page: HASH_PAGE_MAP[hash] || 'home', productId: '1' };
+    return { page: HASH_PAGE_MAP[hash] || 'home', productId: null };
   };
 
   const [currentPage, setCurrentPageState] = useState(() => getInitialPageState().page);
@@ -45,9 +46,12 @@ const AppContent = () => {
 
   const navigateToPage = useCallback((newPage, productId = null) => {
     setCurrentPageState(newPage);
-    if (productId) {
+    if (newPage === 'detail' && productId) {
       setSelectedProductId(productId);
-      window.location.hash = `#produk-${productId}`;
+      const newHash = `#produk-${productId}`;
+      if (window.location.hash !== newHash) {
+        window.location.hash = newHash;
+      }
     } else {
       const newHash = PAGE_HASH_MAP[newPage] || '';
       if (window.location.hash !== newHash) {
@@ -91,15 +95,14 @@ const AppContent = () => {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
+        return <Home setPage={navigateToPage} />;
       case 'catalog':
-        return <Catalog setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
+        return <Catalog setPage={navigateToPage} />;
       case 'detail':
         return (
           <ProductDetail
             productId={selectedProductId}
             setPage={navigateToPage}
-            setSelectedProductId={setSelectedProductId}
           />
         );
       case 'cart':
@@ -109,7 +112,7 @@ const AppContent = () => {
       case 'contact':
         return <Contact />;
       default:
-        return <Home setPage={navigateToPage} setSelectedProductId={setSelectedProductId} />;
+        return <Home setPage={navigateToPage} />;
     }
   };
 
