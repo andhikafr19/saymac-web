@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchAllProducts, getPriceDisplay } from '../services/productService';
 import { Sparkles, ArrowRight, ShieldCheck, Flame, Award, ShoppingBag, Send } from 'lucide-react';
 
-const Home = ({ setPage, setSelectedProductId }) => {
+const Home = ({ setPage }) => {
   const [productsData, setProductsData] = useState([]);
 
   useEffect(() => {
@@ -24,8 +24,7 @@ const Home = ({ setPage, setSelectedProductId }) => {
   const featuredProducts = productsData.filter((p) => p.unggulan && p.stok_tampil).slice(0, 3);
 
   const handleProductClick = (id) => {
-    setSelectedProductId(id);
-    setPage('detail');
+    setPage('detail', id);
     window.scrollTo(0, 0);
   };
 
@@ -281,7 +280,6 @@ const Home = ({ setPage, setSelectedProductId }) => {
               </p>
               <button
                 onClick={() => {
-                  setSelectedProductId("3"); // Redirect to Balado/some product or catalog
                   setPage('catalog');
                   window.scrollTo(0,0);
                 }}

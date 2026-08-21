@@ -3,7 +3,7 @@ import { fetchProductByIdOrSlug, fetchAllProducts, getProductPriceForLevel } fro
 import { useCart } from '../context/CartContext';
 import { Flame, ShoppingCart, ArrowLeft, ShieldCheck, Scale, Check, Loader2 } from 'lucide-react';
 
-const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
+const ProductDetail = ({ productId, setPage }) => {
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
@@ -74,7 +74,7 @@ const ProductDetail = ({ productId, setPage, setSelectedProductId }) => {
   };
 
   const handleRelatedClick = (id) => {
-    setSelectedProductId(id);
+    setPage('detail', id);
     window.scrollTo(0, 0);
   };
 

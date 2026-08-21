@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchAllProducts, getPriceDisplay } from '../services/productService';
 import { Search, Flame, Filter, HelpCircle, Loader2 } from 'lucide-react';
 
-const Catalog = ({ setPage, setSelectedProductId }) => {
+const Catalog = ({ setPage }) => {
   const [productsData, setProductsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,8 +32,7 @@ const Catalog = ({ setPage, setSelectedProductId }) => {
   const categories = ['Semua', 'Best Seller', 'Classic', 'Spicy Fusion', 'Cheese Lover', 'Specialty'];
 
   const handleProductClick = (id) => {
-    setSelectedProductId(id);
-    setPage('detail');
+    setPage('detail', id);
     window.scrollTo(0, 0);
   };
 
