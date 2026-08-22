@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { fetchStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeService';
 import { Trash2, Send, ShoppingBag, MapPin, ClipboardList, User } from 'lucide-react';
 
 const Cart = ({ setPage }) => {
@@ -9,9 +10,21 @@ const Cart = ({ setPage }) => {
   const [customerName, setCustomerName] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
+  const [storeSettings, setStoreSettings] = useState(DEFAULT_STORE_SETTINGS);
 
-  // Default WhatsApp Admin Number (as per open question / dummy template)
-  const WHATSAPP_ADMIN_NUMBER = '6285797987872';
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSettings() {
+      try {
+        const settings = await fetchStoreSettings();
+        if (isMounted) setStoreSettings(settings);
+      } catch (err) {
+        console.error('Error loading store settings in Cart:', err);
+      }
+    }
+    loadSettings();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleCheckout = (e) => {
     e.preventDefault();
@@ -41,7 +54,8 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
 
     // 3. Encode URI
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_ADMIN_NUMBER}?text=${encodedMessage}`;
+    const targetWaNumber = storeSettings.whatsapp_number || '6285797987872';
+    const whatsappUrl = `https://wa.me/${targetWaNumber}?text=${encodedMessage}`;
 
     // 4. Redirect to WhatsApp
     window.open(whatsappUrl, '_blank');

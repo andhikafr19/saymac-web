@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeService';
 import { Phone, Clock, Instagram, Send, Star } from 'lucide-react';
 
 const Footer = ({ setPage }) => {
+  const [storeSettings, setStoreSettings] = useState(DEFAULT_STORE_SETTINGS);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSettings() {
+      try {
+        const settings = await fetchStoreSettings();
+        if (isMounted) setStoreSettings(settings);
+      } catch (err) {
+        console.error('Error loading store settings in Footer:', err);
+      }
+    }
+    loadSettings();
+    return () => { isMounted = false; };
+  }, []);
+
   const handleNav = (page) => {
     setPage(page);
     window.scrollTo(0, 0);
@@ -55,7 +72,7 @@ const Footer = ({ setPage }) => {
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <a
-                href="https://instagram.com/saymacaroni"
+                href={storeSettings.instagram_url || 'https://instagram.com/saymacaroni'}
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -75,7 +92,7 @@ const Footer = ({ setPage }) => {
                 <Instagram size={18} />
               </a>
               <a
-                href="https://wa.me/6281234567890"
+                href={`https://wa.me/${storeSettings.whatsapp_number}`}
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -151,17 +168,19 @@ const Footer = ({ setPage }) => {
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                 <Clock size={18} style={{ color: 'var(--color-primary)', marginTop: '2px' }} />
                 <div>
-                  <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Senin - Sabtu:</span>
-                  <span style={{ fontSize: '0.85rem' }}>09:00 - 21:00 WIB</span>
+                  <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Operasional:</span>
+                  <span style={{ fontSize: '0.85rem' }}>{storeSettings.operational_weekdays}</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <Clock size={18} style={{ color: 'var(--color-spicy)', marginTop: '2px' }} />
-                <div>
-                  <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Minggu / Hari Libur:</span>
-                  <span style={{ fontSize: '0.85rem' }}>10:00 - 17:00 WIB (Slow Response)</span>
+              {storeSettings.operational_weekends && (
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <Clock size={18} style={{ color: 'var(--color-spicy)', marginTop: '2px' }} />
+                  <div>
+                    <span style={{ display: 'block', color: 'var(--color-text-main)', fontWeight: 600, fontSize: '0.9rem' }}>Akhir Pekan / Libur:</span>
+                    <span style={{ fontSize: '0.85rem' }}>{storeSettings.operational_weekends}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
