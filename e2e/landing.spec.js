@@ -77,5 +77,16 @@ test.describe('Say Macaroni Landing Web E2E Test Suite', () => {
     const ctaBtn = campaignBanner.getByRole('button');
     await expect(ctaBtn).toBeVisible();
   });
+
+  test('7. Menampilkan Info Kontak & Tautan WhatsApp Dinamis', async ({ page }) => {
+    await page.getByRole('link', { name: 'Hubungi Kami' }).click();
+    // Check WhatsApp link presence
+    const waLink = page.locator('a[href*="wa.me"]');
+    await expect(waLink.first()).toBeVisible();
+    // Check Footer Instagram & WA link
+    const footer = page.locator('footer');
+    await expect(footer.locator('a[href*="wa.me"]')).toBeVisible();
+  });
 });
+
 

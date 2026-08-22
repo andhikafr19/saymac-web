@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeService';
 import { Phone, Clock, Mail, Instagram, MapPin, Send, HelpCircle } from 'lucide-react';
 
 const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [question, setQuestion] = useState('');
+  const [storeSettings, setStoreSettings] = useState(DEFAULT_STORE_SETTINGS);
 
-  const WHATSAPP_ADMIN_NUMBER = '6281234567890';
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSettings() {
+      try {
+        const settings = await fetchStoreSettings();
+        if (isMounted) setStoreSettings(settings);
+      } catch (err) {
+        console.error('Error loading store settings in Contact:', err);
+      }
+    }
+    loadSettings();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAskQuestion = (e) => {
     e.preventDefault();
@@ -17,7 +31,8 @@ const Contact = () => {
 Mohon informasinya. Terima kasih!`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_ADMIN_NUMBER}?text=${encodedMessage}`;
+    const targetWa = storeSettings.whatsapp_number || '6285797987872';
+    const whatsappUrl = `https://wa.me/${targetWa}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -57,8 +72,8 @@ Mohon informasinya. Terima kasih!`;
                   </div>
                   <div>
                     <span style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>WhatsApp Chat</span>
-                    <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
-                      +62 812-3456-7890
+                    <a href={`https://wa.me/${storeSettings.whatsapp_number}`} target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
+                      {storeSettings.whatsapp_display || `+${storeSettings.whatsapp_number}`}
                     </a>
                   </div>
                 </div>
@@ -70,8 +85,8 @@ Mohon informasinya. Terima kasih!`;
                   </div>
                   <div>
                     <span style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Instagram</span>
-                    <a href="https://instagram.com/saymacaroni" target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
-                      @saymacaroni
+                    <a href={storeSettings.instagram_url} target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
+                      {storeSettings.instagram_handle}
                     </a>
                   </div>
                 </div>
@@ -83,8 +98,8 @@ Mohon informasinya. Terima kasih!`;
                   </div>
                   <div>
                     <span style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Email</span>
-                    <a href="mailto:hello@saymacaroni.com" style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
-                      hello@saymacaroni.com
+                    <a href={`mailto:${storeSettings.email_address}`} style={{ color: '#fff', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }} className="contact-link">
+                      {storeSettings.email_address}
                     </a>
                   </div>
                 </div>
@@ -96,7 +111,10 @@ Mohon informasinya. Terima kasih!`;
                   </div>
                   <div>
                     <span style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Jam Operasional</span>
-                    <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>Senin - Sabtu (09:00 - 21:00)</span>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem' }}>{storeSettings.operational_weekdays}</span>
+                    {storeSettings.operational_weekends && (
+                      <span style={{ display: 'block', color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '2px' }}>{storeSettings.operational_weekends}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -171,7 +189,7 @@ Mohon informasinya. Terima kasih!`;
             <h2 style={{ fontSize: '1.6rem' }}>Lokasi Toko & Produksi Kami</h2>
           </div>
           <p style={{ color: 'var(--color-text-muted)', maxWidth: '600px', margin: '0 auto 24px auto', fontSize: '0.95rem' }}>
-            Kompleks Ruko Primarasa, Blok B-10, Jl. Macaroni Raya No. 45, Jakarta Selatan. Silakan mampir untuk menikmati makaroni hangat yang baru selesai digoreng!
+            {storeSettings.store_address}. Silakan mampir untuk menikmati makaroni hangat yang baru selesai digoreng!
           </p>
 
           {/* Mock Map View (Premium design) */}
@@ -233,12 +251,12 @@ Mohon informasinya. Terima kasih!`;
                 <MapPin size={22} />
               </div>
             </div>
-            <div style={{ zIndex: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+            <div style={{ zIndex: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)', maxWidth: '90%' }}>
               <h4 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Say! Macaroni Headquarters</h4>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Jakarta Selatan, Indonesia</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{storeSettings.store_address}</span>
             </div>
             <a
-              href="https://maps.google.com"
+              href={storeSettings.maps_url || 'https://maps.google.com'}
               target="_blank"
               rel="noreferrer"
               className="btn btn-secondary"
