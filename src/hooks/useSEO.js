@@ -9,27 +9,27 @@ const PAGE_SEO_MAP = {
   catalog: {
     title: 'Katalog Produk - Say Macaroni Premium Snack',
     description: 'Jelajahi semua varian makaroni goreng Say Macaroni! Garlic Butter, Balado Daun Jeruk, Pedas Manis, dan Original. Pilih level pedas favoritmu.',
-    canonical: 'https://saymacaroni.vercel.app/#katalog',
+    canonical: 'https://saymacaroni.vercel.app/',
   },
   detail: {
     title: 'Detail Produk - Say Macaroni',
     description: 'Lihat detail rasa, tingkat kepedasan, dan ukuran kemasan makaroni goreng Say Macaroni.',
-    canonical: 'https://saymacaroni.vercel.app/#detail',
+    canonical: 'https://saymacaroni.vercel.app/',
   },
   about: {
     title: 'Tentang Kami - Say Macaroni Story',
     description: 'Pelajari kisah di balik renyahnya Say Macaroni. Dibuat dari bahan alami berkualitas tinggi dengan bumbu gurih khas tanpa gatal di tenggorokan.',
-    canonical: 'https://saymacaroni.vercel.app/#tentang',
+    canonical: 'https://saymacaroni.vercel.app/',
   },
   contact: {
     title: 'Hubungi Kami - Say Macaroni Official',
     description: 'Hubungi tim Say Macaroni untuk pemesanan, reseller, hampers, atau pertanyaan seputar produk makaroni goreng premium kami.',
-    canonical: 'https://saymacaroni.vercel.app/#kontak',
+    canonical: 'https://saymacaroni.vercel.app/',
   },
   cart: {
     title: 'Keranjang Belanja - Say Macaroni',
     description: 'Ringkasan pesanan makaroni goreng Say Macaroni kamu sebelum melakukan pesan instan via WhatsApp.',
-    canonical: 'https://saymacaroni.vercel.app/#keranjang',
+    canonical: 'https://saymacaroni.vercel.app/',
   },
 };
 
