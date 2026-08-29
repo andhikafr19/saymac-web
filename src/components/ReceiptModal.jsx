@@ -29,6 +29,10 @@ const ReceiptModal = ({ order, onClose }) => {
         pixelRatio: 3,
         backgroundColor: '#ffffff',
         cacheBust: true,
+        style: {
+          margin: '0',
+          boxShadow: 'none',
+        },
       });
 
       const cleanCode = (order.order_code || 'PESANAN').replace(/[^a-zA-Z0-9-_]/g, '');
@@ -116,107 +120,110 @@ const ReceiptModal = ({ order, onClose }) => {
           </div>
         </div>
 
-        {/* Thermal Paper Receipt Container */}
-        <div className="receipt-paper" id="printable-receipt">
-          {/* Top Circular Logo */}
-          <div className="receipt-logo-wrap">
-            <img 
-              src="/images/say_macaroni_logo-removebg.png" 
-              alt="Say Macaroni Logo" 
-              className="receipt-logo"
-              crossOrigin="anonymous"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-            />
-          </div>
-
-          {/* Store Info */}
-          <div className="receipt-header">
-            <h2 className="receipt-store-name">Say Macaroni</h2>
-            <div className="receipt-store-sub">Jl. Macaroni Raya No. 45</div>
-            <div className="receipt-store-sub">Tlp 085797987872</div>
-          </div>
-
-          <div className="receipt-dashed-line" />
-
-          {/* Transaction Metadata (2 Columns) */}
-          <div className="receipt-meta-row">
-            <div className="receipt-meta-col-left">
-              <div>{dateStr}</div>
-              <div>{timeStr}</div>
-              <div>{order.order_code || '-'}</div>
+        {/* Outer Wrapper to handle modal centering without margin offset on canvas */}
+        <div className="receipt-paper-wrapper">
+          {/* Thermal Paper Receipt Container */}
+          <div className="receipt-paper" id="printable-receipt">
+            {/* Top Circular Logo */}
+            <div className="receipt-logo-wrap">
+              <img 
+                src="/images/say_macaroni_logo-removebg.png" 
+                alt="Say Macaroni Logo" 
+                className="receipt-logo"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
             </div>
-            <div className="receipt-meta-col-right">
-              <div className="receipt-customer-name">{order.customer_name || 'Pelanggan'}</div>
-              <div>{order.customer_phone || ''}</div>
-              {order.customer_address && (
-                <div className="receipt-address-trunc" title={order.customer_address}>
-                  {order.customer_address.length > 25 ? order.customer_address.slice(0, 25) + '...' : order.customer_address}
-                </div>
-              )}
+
+            {/* Store Info */}
+            <div className="receipt-header">
+              <h2 className="receipt-store-name">Say Macaroni</h2>
+              <div className="receipt-store-sub">Jl. Macaroni Raya No. 45</div>
+              <div className="receipt-store-sub">Tlp 085797987872</div>
             </div>
-          </div>
 
-          <div className="receipt-dashed-line" />
+            <div className="receipt-dashed-line" />
 
-          {/* Item List (Simplified: Direct Flavor + Level) */}
-          <div className="receipt-items-list">
-            {items.map((item, index) => {
-              const cleanedName = cleanProductName(item.product_name || item.nama);
-              const spicyLvl = item.spicy_level ?? item.level_pedas;
-              const levelLabel = Number(spicyLvl) === 0 || spicyLvl === undefined
-                ? '(Tanpa Pedas)'
-                : `(Level ${spicyLvl})`;
-
-              const itemPrice = Number(item.price || item.harga || 0);
-              const itemQty = Number(item.quantity || 1);
-              const subtotal = Number(item.subtotal || itemPrice * itemQty);
-
-              return (
-                <div key={index} className="receipt-item-entry">
-                  <div className="receipt-item-title">
-                    {cleanedName} {levelLabel}
+            {/* Transaction Metadata (2 Columns) */}
+            <div className="receipt-meta-row">
+              <div className="receipt-meta-col-left">
+                <div>{dateStr}</div>
+                <div>{timeStr}</div>
+                <div>{order.order_code || '-'}</div>
+              </div>
+              <div className="receipt-meta-col-right">
+                <div className="receipt-customer-name">{order.customer_name || 'Pelanggan'}</div>
+                <div>{order.customer_phone || ''}</div>
+                {order.customer_address && (
+                  <div className="receipt-address-trunc" title={order.customer_address}>
+                    {order.customer_address.length > 25 ? order.customer_address.slice(0, 25) + '...' : order.customer_address}
                   </div>
-                  <div className="receipt-item-math">
-                    <span>{itemQty} x {itemPrice.toLocaleString('id-ID')}</span>
-                    <span>Rp {subtotal.toLocaleString('id-ID')}</span>
+                )}
+              </div>
+            </div>
+
+            <div className="receipt-dashed-line" />
+
+            {/* Item List (Simplified: Direct Flavor + Level) */}
+            <div className="receipt-items-list">
+              {items.map((item, index) => {
+                const cleanedName = cleanProductName(item.product_name || item.nama);
+                const spicyLvl = item.spicy_level ?? item.level_pedas;
+                const levelLabel = Number(spicyLvl) === 0 || spicyLvl === undefined
+                  ? '(Tanpa Pedas)'
+                  : `(Level ${spicyLvl})`;
+
+                const itemPrice = Number(item.price || item.harga || 0);
+                const itemQty = Number(item.quantity || 1);
+                const subtotal = Number(item.subtotal || itemPrice * itemQty);
+
+                return (
+                  <div key={index} className="receipt-item-entry">
+                    <div className="receipt-item-title">
+                      {cleanedName} {levelLabel}
+                    </div>
+                    <div className="receipt-item-math">
+                      <span>{itemQty} x {itemPrice.toLocaleString('id-ID')}</span>
+                      <span>Rp {subtotal.toLocaleString('id-ID')}</span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="receipt-dashed-line" />
-
-          {/* Totals Section */}
-          <div className="receipt-total-block">
-            <div className="receipt-total-row">
-              <span>Total</span>
-              <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
+                );
+              })}
             </div>
-          </div>
 
-          {/* Notes if present */}
-          {order.customer_notes && (
-            <div className="receipt-notes-block">
-              <span className="receipt-notes-label">Catatan:</span> {order.customer_notes}
+            <div className="receipt-dashed-line" />
+
+            {/* Totals Section */}
+            <div className="receipt-total-block">
+              <div className="receipt-total-row">
+                <span>Total</span>
+                <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
+              </div>
             </div>
-          )}
 
-          {/* Payment Account Information */}
-          <div className="receipt-payment-info">
-            <div style={{ marginBottom: '4px', fontWeight: 600 }}>Pembayaran melalui Rek :</div>
-            <div>BCA : 1234567890</div>
-            <div>MANDIRI : 1310012948578</div>
-            <div>BRI : 074901011451537</div>
-            <div style={{ marginTop: '4px', fontWeight: 700 }}>A.N SAY MACARONI</div>
-          </div>
+            {/* Notes if present */}
+            {order.customer_notes && (
+              <div className="receipt-notes-block">
+                <span className="receipt-notes-label">Catatan:</span> {order.customer_notes}
+              </div>
+            )}
 
-          {/* Receipt Footer */}
-          <div className="receipt-footer">
-            <div className="receipt-thanks">Kriuk Lezat Bikin Nagih! 🍿</div>
-            <div style={{ fontSize: '0.75rem', color: '#666' }}>Terima Kasih Telah Berbelanja</div>
+            {/* Payment Account Information */}
+            <div className="receipt-payment-info">
+              <div style={{ marginBottom: '4px', fontWeight: 600 }}>Pembayaran melalui Rek :</div>
+              <div>BCA : 1234567890</div>
+              <div>MANDIRI : 1310012948578</div>
+              <div>BRI : 074901011451537</div>
+              <div style={{ marginTop: '4px', fontWeight: 700 }}>A.N SAY MACARONI</div>
+            </div>
+
+            {/* Receipt Footer */}
+            <div className="receipt-footer">
+              <div className="receipt-thanks">Kriuk Lezat Bikin Nagih! 🍿</div>
+              <div style={{ fontSize: '0.75rem', color: '#666' }}>Terima Kasih Telah Berbelanja</div>
+            </div>
           </div>
         </div>
       </div>
@@ -263,6 +270,14 @@ const ReceiptModal = ({ order, onClose }) => {
           flex-wrap: wrap;
         }
 
+        .receipt-paper-wrapper {
+          padding: 20px;
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
         .receipt-paper {
           background: #ffffff;
           color: #000000;
@@ -270,11 +285,16 @@ const ReceiptModal = ({ order, onClose }) => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
           font-size: 0.875rem;
           line-height: 1.35;
-          margin: 16px auto;
-          max-width: 360px;
+          margin: 0;
+          max-width: 380px;
           width: 100%;
           border-radius: 6px;
           box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          box-sizing: border-box;
+        }
+
+        .receipt-paper * {
+          box-sizing: border-box;
         }
 
         .receipt-logo-wrap {
@@ -320,14 +340,20 @@ const ReceiptModal = ({ order, onClose }) => {
           font-size: 0.825rem;
           color: #222222;
           line-height: 1.4;
+          width: 100%;
         }
 
         .receipt-meta-col-left {
           text-align: left;
+          flex: 1;
         }
 
         .receipt-meta-col-right {
           text-align: right;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
         }
 
         .receipt-customer-name {
@@ -339,6 +365,7 @@ const ReceiptModal = ({ order, onClose }) => {
           font-size: 0.75rem;
           color: #555555;
           max-width: 170px;
+          word-break: break-word;
         }
 
         .receipt-items-list {
@@ -346,18 +373,21 @@ const ReceiptModal = ({ order, onClose }) => {
           flex-direction: column;
           gap: 10px;
           margin: 4px 0;
+          width: 100%;
         }
 
         .receipt-item-entry {
           display: flex;
           flex-direction: column;
           gap: 2px;
+          width: 100%;
         }
 
         .receipt-item-title {
           font-weight: 700;
           font-size: 0.875rem;
           color: #000000;
+          word-break: break-word;
         }
 
         .receipt-item-math {
@@ -365,10 +395,12 @@ const ReceiptModal = ({ order, onClose }) => {
           justify-content: space-between;
           font-size: 0.825rem;
           color: #222222;
+          width: 100%;
         }
 
         .receipt-total-block {
           margin: 4px 0;
+          width: 100%;
         }
 
         .receipt-total-row {
@@ -377,6 +409,7 @@ const ReceiptModal = ({ order, onClose }) => {
           font-size: 0.95rem;
           font-weight: 700;
           color: #000000;
+          width: 100%;
         }
 
         .receipt-notes-block {
@@ -386,6 +419,7 @@ const ReceiptModal = ({ order, onClose }) => {
           font-size: 0.775rem;
           color: #333333;
           margin: 8px 0;
+          word-break: break-word;
         }
 
         .receipt-notes-label {
@@ -474,6 +508,11 @@ const ReceiptModal = ({ order, onClose }) => {
             overflow: visible !important;
             padding: 0 !important;
             margin: 0 !important;
+          }
+
+          .receipt-paper-wrapper {
+            padding: 0 !important;
+            display: block !important;
           }
 
           .receipt-paper {
