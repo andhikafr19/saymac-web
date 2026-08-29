@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { createOrder } from '../services/orderService';
 import ReceiptModal from '../components/ReceiptModal';
-import { 
-  Trash2, 
-  Send, 
-  ShoppingBag, 
-  MapPin, 
-  ClipboardList, 
-  User, 
-  Phone, 
-  CheckCircle2, 
-  Printer, 
-  ArrowRight, 
-  Loader2 
+import {
+  Trash2,
+  Send,
+  ShoppingBag,
+  MapPin,
+  ClipboardList,
+  User,
+  Phone,
+  CheckCircle2,
+  Printer,
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 
 const Cart = ({ setPage }) => {

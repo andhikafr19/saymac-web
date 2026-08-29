@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAllProducts, getPriceDisplay } from '../services/productService';
+import { fetchActiveCampaign } from '../services/campaignService';
 import { Sparkles, ArrowRight, ShieldCheck, Flame, Award, ShoppingBag, Send } from 'lucide-react';
 
-const Home = ({ setPage, setSelectedProductId }) => {
+const Home = ({ setPage }) => {
   const [productsData, setProductsData] = useState([]);
+  const [campaign, setCampaign] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
-    async function loadProducts() {
+    async function loadData() {
       try {
-        const data = await fetchAllProducts();
+        const [products, campaignData] = await Promise.all([
+          fetchAllProducts(),
+          fetchActiveCampaign()
+        ]);
         if (isMounted) {
-          setProductsData(data);
+          setProductsData(products);
+          setCampaign(campaignData);
         }
       } catch (err) {
-        console.error('Error fetching home products:', err);
+        console.error('Error fetching home data:', err);
       }
     }
-    loadProducts();
+    loadData();
     return () => { isMounted = false; };
   }, []);
 
   const featuredProducts = productsData.filter((p) => p.unggulan && p.stok_tampil).slice(0, 3);
 
   const handleProductClick = (id) => {
-    setSelectedProductId(id);
-    setPage('detail');
+    setPage('detail', id);
     window.scrollTo(0, 0);
   };
 
@@ -239,75 +244,85 @@ const Home = ({ setPage, setSelectedProductId }) => {
         </div>
       </section>
 
-      {/* Special Theme Campaign Banner (Ramadhan/Lebaran Campaign) */}
-      <section style={{ padding: '40px 0' }}>
-        <div className="container">
-          <div
-            className="glass-panel campaign-banner"
-            style={{
-              borderRadius: 'var(--radius-lg)',
-              padding: '48px',
-              position: 'relative',
-              overflow: 'hidden',
-              background: 'linear-gradient(135deg, var(--color-bg-card) 0%, rgba(33, 158, 188, 0.15) 100%)',
-              border: '1px solid rgba(255, 183, 3, 0.15)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 0.8fr',
-              gap: '32px',
-              alignItems: 'center',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(255, 183, 3, 0.15)',
-                  color: 'var(--color-primary)',
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '0.8rem',
-                  fontWeight: '700',
-                  marginBottom: '16px',
-                }}
-              >
-                🌙 Edisi Khusus Ramadhan & Lebaran
+      {/* Special Theme Campaign Banner (Dynamic from CMS) */}
+      {campaign && campaign.is_active !== false && (
+        <section style={{ padding: '40px 0' }}>
+          <div className="container">
+            <div
+              className="glass-panel campaign-banner"
+              style={{
+                borderRadius: 'var(--radius-lg)',
+                padding: '48px',
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, var(--color-bg-card) 0%, rgba(33, 158, 188, 0.15) 100%)',
+                border: '1px solid rgba(255, 183, 3, 0.15)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 0.8fr',
+                gap: '32px',
+                alignItems: 'center',
+              }}
+            >
+              <div>
+                {campaign.badge_text && (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'rgba(255, 183, 3, 0.15)',
+                      color: 'var(--color-primary)',
+                      padding: '4px 12px',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    {campaign.badge_text}
+                  </div>
+                )}
+                <h2 style={{ fontSize: '2rem', marginBottom: '16px', fontWeight: 800 }}>
+                  {campaign.title || 'Say Macaroni Hampers Pack'}
+                </h2>
+                <p style={{ color: 'var(--color-text-muted)', lineHeight: '1.6', marginBottom: '24px', fontSize: '0.95rem' }}>
+                  {campaign.description}
+                </p>
+                <button
+                  onClick={() => {
+                    const target = campaign.cta_link || 'catalog';
+                    if (target.startsWith('http://') || target.startsWith('https://')) {
+                      window.open(target, '_blank');
+                    } else {
+                      setPage(target);
+                      window.scrollTo(0, 0);
+                    }
+                  }}
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', gap: '8px', fontWeight: 700 }}
+                >
+                  {campaign.cta_text || 'Lihat Promo'} <ShoppingBag size={18} />
+                </button>
               </div>
-              <h2 style={{ fontSize: '2rem', marginBottom: '16px', fontWeight: 800 }}>Say Macaroni Hampers Pack</h2>
-              <p style={{ color: 'var(--color-text-muted)', lineHeight: '1.6', marginBottom: '24px', fontSize: '0.95rem' }}>
-                Bagikan kebahagiaan kriuk premium di hari kemenangan! Dapatkan paket hampers cantik isi 4 botol/pouch varian rasa bebas pilih dengan kartu ucapan Lebaran eksklusif. Stok terbatas selama bulan suci!
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedProductId("3"); // Redirect to Balado/some product or catalog
-                  setPage('catalog');
-                  window.scrollTo(0,0);
-                }}
-                className="btn btn-primary"
-                style={{ display: 'inline-flex', gap: '8px', fontWeight: 700 }}
-              >
-                Pesan Hampers Sekarang <ShoppingBag size={18} />
-              </button>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <img
-                src="/images/balado_jeruk_1.jpg"
-                alt="Ramadhan Hampers Say Macaroni"
-                style={{
-                  width: '100%',
-                  maxWidth: '280px',
-                  borderRadius: 'var(--radius-md)',
-                  transform: 'rotate(2deg)',
-                  boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
-                  border: '4px solid rgba(255, 255, 255, 0.05)',
-                }}
-              />
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <img
+                  src={campaign.image_url || '/images/balado_jeruk_1.jpg'}
+                  alt={campaign.title || 'Promo Say Macaroni'}
+                  style={{
+                    width: '100%',
+                    maxWidth: '280px',
+                    borderRadius: 'var(--radius-md)',
+                    transform: 'rotate(2deg)',
+                    boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
+                    border: '4px solid rgba(255, 255, 255, 0.05)',
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Brand Story / Cerita Singkat */}
       <section style={{ padding: '60px 0' }}>
