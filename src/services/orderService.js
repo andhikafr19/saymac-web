@@ -80,31 +80,37 @@ export async function createOrder({
   // Try persisting to Supabase if configured
   if (isSupabaseConfigured && supabase) {
     try {
+      // 1. Generate client UUID for order header
+      const orderId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID()
+        : ('ord-' + Date.now());
+
+      const orderPayload = {
+        id: orderId,
+        order_code: orderCode,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        customer_notes: customerNotes,
+        total_amount: calculatedTotal,
+        status: 'pending',
+        payment_status: 'unpaid',
+      };
+
       // 1. Insert order header
-      const { data: orderHeader, error: headerError } = await supabase
+      const { error: headerError } = await supabase
         .from('orders')
-        .insert({
-          order_code: orderCode,
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_address: customerAddress,
-          customer_notes: customerNotes,
-          total_amount: calculatedTotal,
-          status: 'pending',
-          payment_status: 'unpaid',
-        })
-        .select()
-        .single();
+        .insert(orderPayload);
 
       if (headerError) {
-        console.warn('Supabase order insert notice:', headerError.message);
+        console.error('Supabase order insert error:', headerError);
         return { success: true, order: localOrderData, source: 'local' };
       }
 
       // 2. Insert order items
-      if (orderHeader && formattedItems.length > 0) {
+      if (formattedItems.length > 0) {
         const itemsToInsert = formattedItems.map((item) => ({
-          order_id: orderHeader.id,
+          order_id: orderId,
           product_id: item.product_id,
           product_name: item.product_name,
           spicy_level: item.spicy_level,
@@ -119,18 +125,19 @@ export async function createOrder({
           .insert(itemsToInsert);
 
         if (itemsError) {
-          console.warn('Supabase order_items insert notice:', itemsError.message);
+          console.error('Supabase order_items insert error:', itemsError);
         }
       }
 
       const fullOrder = {
-        ...orderHeader,
+        ...orderPayload,
+        created_at: now,
         items: formattedItems,
       };
 
       return { success: true, order: fullOrder, source: 'supabase' };
     } catch (err) {
-      console.warn('Error saving order to Supabase, fallback to local:', err);
+      console.error('Error saving order to Supabase, fallback to local:', err);
       return { success: true, order: localOrderData, source: 'local' };
     }
   }
