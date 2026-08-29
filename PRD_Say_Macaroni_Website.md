@@ -1,186 +1,163 @@
 # Product Requirements Document (PRD)
 # Website Profiling & Katalog Produk — Say Macaroni
 
-**Versi:** 1.0
-**Tanggal:** 19 Juli 2026
-**Dokumen untuk:** Tim Development / Freelancer / Agency
+**Versi:** 1.4  
+**Status:** Terimplementasi / Siap Produksi (Customer Flow & Order Logging Terintegrasi Backoffice)  
+**Terakhir Diperbarui:** 29 Agustus 2026  
+**Dokumen untuk:** Tim Development, Product Owner, & Stakeholder Say Macaroni  
 
 ---
 
-## 1. Latar Belakang
+## 1. Latar Belakang & Deskripsi Produk
 
-Say Macaroni adalah brand makanan ringan berupa makaroni goreng dengan berbagai varian rasa (contoh: Garlic) dan level kepedasan. Saat ini penjualan belum memiliki kanal digital resmi berupa website. Dibutuhkan website profiling yang berfungsi sebagai etalase produk (katalog) sekaligus media pemesanan, dengan alur checkout tahap awal yang diarahkan secara manual ke WhatsApp (belum terintegrasi payment gateway).
+**Say Macaroni** adalah brand makanan ringan makaroni goreng khas dengan aneka varian rasa gurih-lezat (Garlic Butter, Original Classic, Balado Daun Jeruk, Keju Premium, Salted Egg) dan tingkatan level kepedasan berjenjang (Level 0–5). 
 
-## 2. Tujuan Produk
+Aplikasi **Say Macaroni Web** (`saymac-web`) dibangun sebagai website profiling brand sekaligus etalase katalog pemesanan digital modern yang fokus murni pada **pengalaman pelanggan (Customer Experience)**. Website ini memungkinkan calon pembeli menjelajahi varian produk, memilih level pedas dengan penyesuaian harga dinamis (*dynamic pricing*), mengelola keranjang belanja lokal (*client-side cart*), dan melakukan pemesanan instan.
 
-1. Menyediakan katalog produk Say Macaroni yang bisa diakses publik secara online.
-2. Memudahkan calon pembeli melihat varian rasa, level pedas, harga, dan berat kemasan.
-3. Memungkinkan pembeli memilih produk + jumlah, lalu mengirim pesanan otomatis ke WhatsApp Admin tanpa perlu mengetik manual.
-4. Membangun kredibilitas brand (branding, cerita brand, kontak resmi).
-5. Menjadi fondasi yang siap dikembangkan ke arah e-commerce penuh (payment gateway, ongkir otomatis) di fase berikutnya.
-
-## 3. Target Pengguna
-
-- **Pembeli akhir (konsumen):** individu yang ingin membeli camilan makaroni untuk konsumsi pribadi/keluarga, termasuk momen spesial seperti Ramadhan/Lebaran.
-- **Reseller/agen:** pihak yang ingin order dalam jumlah besar.
-- **Admin toko (pemilik/owner Say Macaroni):** mengelola data produk dan menerima pesanan masuk via WhatsApp.
-
-## 4. Ruang Lingkup (Scope)
-
-### 4.1 In Scope (Tahap 1)
-- Landing page / halaman utama (hero, highlight promo, brand story singkat)
-- Halaman katalog produk (list semua varian)
-- Halaman detail produk
-- Fitur "Keranjang" (cart) sederhana, disimpan di sisi client (local storage), tanpa akun/login
-- Checkout: generate pesan otomatis berisi daftar produk + jumlah + total estimasi, lalu redirect ke WhatsApp (via `wa.me` link)
-- Halaman "Tentang Kami"
-- Halaman "Hubungi Kami" (kontak, media sosial, lokasi jika ada)
-- Responsive design (mobile-first, karena mayoritas trafik dari WhatsApp/Instagram ke mobile browser)
-- Admin sederhana untuk update data produk (lihat opsi di bagian 7.7)
-
-### 4.2 Out of Scope (Tahap 1 — untuk fase berikutnya)
-- Pembayaran online (payment gateway: transfer otomatis, e-wallet, QRIS terintegrasi)
-- Sistem akun/login pembeli
-- Perhitungan ongkos kirim otomatis (integrasi kurir/logistik)
-- Riwayat transaksi pembeli
-- Sistem stok otomatis real-time yang terhubung ke pesanan
-- Multi-bahasa
-
-## 5. Alur Pengguna (User Flow)
-
-1. Pengunjung membuka website (dari link di bio Instagram/WhatsApp/Google).
-2. Melihat halaman utama → klik "Lihat Katalog" atau langsung scroll produk unggulan.
-3. Masuk ke halaman katalog, bisa filter/sortir berdasarkan varian rasa atau level pedas.
-4. Klik salah satu produk → masuk ke halaman detail (foto, deskripsi, harga dinamis per level pedas, berat, pemilih level pedas, tombol jumlah/qty). Memilih level pedas akan memperbarui harga produk secara real-time.
-5. Klik "Tambah ke Keranjang" → produk beserta level pedas dan harga spesifik level tersebut masuk cart (badge jumlah item di ikon cart bertambah).
-6. Bisa lanjut belanja produk lain, atau langsung klik ikon cart untuk melihat ringkasan.
-7. Di halaman cart: bisa ubah jumlah, hapus item, lihat estimasi total harga.
-8. Klik "Pesan via WhatsApp" → sistem generate teks pesanan otomatis → membuka WhatsApp (app/web) dengan nomor Admin Say Macaroni dan pesan sudah terisi otomatis.
-9. Pembeli tinggal klik "Kirim" di WhatsApp → Admin menerima pesanan dan melanjutkan proses (konfirmasi harga final, ongkir, pembayaran) secara manual via chat.
-
-## 6. Format Pesan Otomatis ke WhatsApp
-
-Contoh template yang digenerate sistem (URL-encoded ke `wa.me`):
-
-```
-Halo Say Macaroni, saya ingin memesan:
-
-1. Say Macaroni - Garlic (Level Pedas 2) x2 = Rp 52.000
-2. Say Macaroni - Original (Level Pedas 0) x1 = Rp 22.000
-
-Total: Rp 74.000
-
-Nama: -
-Alamat: -
-Catatan: -
-
-Mohon info ongkir & total pembayaran. Terima kasih!
-```
-
-Catatan: Nama/Alamat/Catatan bisa dikosongkan agar pembeli mengisi manual di chat, atau (opsional) dibuatkan form singkat sebelum redirect ke WA agar data ini otomatis terisi juga.
-
-## 7. Kebutuhan Fungsional (Functional Requirements)
-
-### 7.1 Halaman Utama (Home)
-- Hero section dengan logo, tagline, dan foto produk
-- Section "Produk Unggulan" (highlight beberapa varian, menampilkan harga dasar/mulai)
-- Section promo/tema musiman (contoh: banner Ramadhan seperti pada referensi gambar yang dikirim)
-- CTA ke halaman katalog dan ke WhatsApp langsung (untuk pertanyaan umum)
-
-### 7.2 Halaman Katalog Produk
-- Grid produk menampilkan: foto, nama produk, varian rasa, level pedas (ikon cabai), harga dasar / kisaran harga ("Mulai Rp XX.XXX"), berat kemasan
-- Filter/kategori: berdasarkan rasa, level pedas, atau jenis kemasan
-- Search bar (opsional, jika jumlah produk sudah banyak)
-
-### 7.3 Halaman Detail Produk
-- Galeri foto produk
-- Nama produk, deskripsi, komposisi/bahan (opsional), berat, harga yang menyesuaikan secara real-time dengan level pedas yang dipilih
-- Indikator & pemilih level pedas (visual ikon cabai + informasi harga per level)
-- Input jumlah (qty stepper)
-- Tombol "Tambah ke Keranjang" (menyimpan item dengan harga level pedas terkait)
-- Produk terkait (related products)
-
-### 7.4 Keranjang (Cart)
-- Daftar item yang dipilih (foto, nama, varian, level pedas, harga spesifik level, qty, subtotal)
-- Bisa edit qty atau hapus item
-- Menampilkan total estimasi harga berdasarkan level pedas item
-- Tombol "Pesan via WhatsApp" (aksi utama)
-- Cart disimpan di local storage browser (bertahan meski browser ditutup, tapi tidak lintas device)
-
-### 7.5 Halaman Tentang Kami
-- Cerita brand, keunggulan produk, sertifikasi (jika ada, misal Halal/PIRT)
-
-### 7.6 Halaman Kontak
-- Nomor WhatsApp, Instagram, email (jika ada)
-- Jam operasional respon chat
-- Peta lokasi (jika ada toko fisik/gudang, opsional)
-
-### 7.7 Manajemen Produk (Admin)
-Untuk tahap awal, ada dua opsi realistis:
-- **Opsi A (paling sederhana & murah):** Data produk dikelola langsung oleh developer/pemilik lewat file data (misal spreadsheet/CMS ringan seperti Google Sheets yang di-sync, atau headless CMS gratis seperti Sanity/Notion-as-CMS).
-- **Opsi B (lebih fleksibel):** Dashboard admin sederhana (login khusus admin) untuk tambah/edit/hapus produk, upload foto, atur harga & stok tampil/tidak tampil.
-
-*Rekomendasi: mulai dari Opsi A untuk menghemat waktu & biaya development, upgrade ke Opsi B saat jumlah produk sudah banyak atau update harga sering berubah.*
-
-## 8. Kebutuhan Non-Fungsional
-
-- **Responsive:** tampil optimal di mobile, tablet, desktop (prioritas mobile)
-- **Performa:** waktu load halaman < 3 detik pada koneksi 4G
-- **SEO dasar:** meta title/description per halaman, sitemap, gambar dengan alt text, agar mudah ditemukan di Google
-- **Keamanan:** HTTPS, tidak menyimpan data sensitif pembeli di server (karena checkout manual via WA)
-- **Ketersediaan:** hosting dengan uptime baik (disarankan platform seperti Vercel/Netlify untuk frontend statis + database ringan)
-- **Analytics:** integrasi Google Analytics / Meta Pixel untuk memantau trafik dan sumber pengunjung
-
-## 9. Struktur Data Produk (Data Model)
-
-| Field | Tipe | Keterangan |
-|---|---|---|
-| id | string/number | ID unik produk |
-| nama | string | Nama produk, misal "Say Macaroni - Garlic" |
-| varian_rasa | string | Garlic, Original, Balado, dll |
-| level_pedas | array of numbers | Pilihan level pedas yang tersedia (0–5) |
-| harga | number | Harga dasar / harga mulai jual |
-| harga_level | array of objects `{ level, harga }` | Pengaturan harga khusus per level pedas (opsional) |
-| berat | string | Contoh: 150g, 250g |
-| stok_tampil | boolean | Untuk sembunyikan produk yang sedang habis |
-| deskripsi | text | Deskripsi produk |
-| komposisi | text | Bahan utama produk |
-| foto | array of image URL / Sanity Image | Foto produk (bisa lebih dari 1) |
-| kategori | string | Kategori produk (Best Seller, Classic, Spicy Fusion, dll) |
-| unggulan | boolean | Penanda produk unggulan untuk banner Home |
-
-## 10. Rekomendasi Teknologi (Tech Stack)
-
-Karena kebutuhan tahap ini masih catalog + cart lokal + redirect WA (tanpa transaksi online), stack yang ringan dan murah cukup memadai:
-
-- **Frontend:** Next.js / React (mudah dikembangkan lebih lanjut ke arah e-commerce nanti) atau alternatif lebih ringan seperti Astro jika ingin sangat cepat & SEO-friendly
-- **Styling:** Tailwind CSS
-- **Data produk:** mulai dari JSON/Google Sheets API atau headless CMS ringan (Sanity, Notion API, atau Supabase sebagai database sederhana)
-- **Hosting:** Vercel/Netlify (gratis untuk skala kecil-menengah)
-- **Cart state:** React Context / Zustand + local storage
-- **Integrasi WhatsApp:** `https://wa.me/62xxxxxxxxxx?text=<pesan_ter-encode>`
-
-## 11. Metrik Keberhasilan (Success Metrics)
-
-- Jumlah pengunjung unik per bulan
-- Jumlah klik tombol "Pesan via WhatsApp" (conversion dari cart ke WA)
-- Rasio pengunjung katalog → detail produk → cart → checkout WA
-- Waktu rata-rata pengunjung di halaman katalog/detail
-
-## 12. Rencana Pengembangan (Roadmap Singkat)
-
-| Fase | Fitur | Estimasi |
-|---|---|---|
-| Fase 1 (MVP) | Home, Katalog, Detail Produk, Cart, Checkout WA, Tentang, Kontak | 2–4 minggu |
-| Fase 2 | Dashboard admin untuk kelola produk sendiri | +1–2 minggu |
-| Fase 3 | Integrasi payment gateway & ongkir otomatis (opsional, jika volume order sudah besar) | Menyusul |
-
-## 13. Lampiran
-
-- Logo brand: bowl biru dengan tulisan "Say! Macaroni", elemen makaroni kuning
-- Referensi visual kemasan: label produk mencantumkan varian rasa (contoh: Garlic) dan indikator level pedas berbentuk ikon cabai
-- Tone visual: warna biru tua & kuning/emas sebagai identitas brand, dengan nuansa tema musiman (misal Ramadhan) untuk campaign tertentu
+Setiap pesanan yang dibuat pelanggan secara otomatis dicatat ke database Supabase (`orders` & `order_items`) dengan kode unik (*Order ID*), diteruskan ke WhatsApp Admin resmi untuk konfirmasi pembayaran & ongkir, dan dapat langsung dicetak sebagai **Struk Digital / Invoice PDF** oleh pelanggan sebagai bukti pembelian. Seluruh antrean pesanan masuk tersebut secara *real-time* diproses dan dikelola oleh tim admin melalui aplikasi **Say Macaroni Backoffice (`saymac-backoffice`)**.
 
 ---
 
-*Dokumen ini adalah acuan awal (living document) dan dapat disesuaikan bersama tim development seiring diskusi teknis lebih lanjut.*
+## 2. Tujuan Produk (Product Goals)
+
+1. **Etalase Digital Resmi & Kredibilitas**: Menyediakan katalog online interaktif dengan branding visual premium (*rich aesthetics*, mode gelap/terang, tipografi modern, dan animasi halus).
+2. **Pencatatan Pesanan Otomatis ke Database**: Menyimpan setiap transaksi ke tabel `orders` & `order_items` di Supabase secara real-time dengan cadangan offline (*local storage fallback*).
+3. **Pemesanan Mudah & Terintegrasi WhatsApp**: Mengotomatisasi perincian pesanan (Kode Order, varian, level pedas, kuantitas, harga, total, dan data penerima) langsung ke nomor WhatsApp Admin resmi via URL deep linking (`wa.me`).
+4. **Cetak Struk Digital Pelanggan (PDF)**: Menyediakan bukti struk transaksi digital yang dapat dicetak atau disimpan langsung sebagai file PDF dari browser oleh pelanggan.
+5. **Dynamic Level Pricing & Sinkronisasi Konten Toko**: Mendukung harga dinamis per level pedas, banner promo musiman (`campaigns`), dan kontak toko dinamis (`store_settings`) dari Supabase.
+6. **Pemisahan Peran Bersih**: Menjaga website publik tetap ringan, cepat, dan fokus pada konversi pembeli, sementara seluruh urusan administrasi dan rekapitulasi data dikelola secara terpusat di `saymac-backoffice`.
+
+---
+
+## 3. Target Pengguna (Target Audience)
+
+- **Konsumen Akhir (Retail):** Penggemar camilan makaroni yang ingin membeli untuk konsumsi pribadi, keluarga, atau hampers momen spesial (Ramadhan/Lebaran) serta menginginkan kemudahan checkout dan bukti struk pesanan digital.
+- **Reseller / Calon Mitra Bisnis:** Pihak yang ingin menghubungi admin toko untuk kemitraan melalui tautan WhatsApp resmi yang selalu aktif.
+
+---
+
+## 4. Ruang Lingkup & Status Fitur (Scope & Status)
+
+### 4.1 Modul Pengguna (saymac-web)
+
+| Modul / Fitur | Deskripsi | Status |
+|---|---|:---:|
+| **Landing Page (Home)** | Hero section dengan CTA interaktif, highlight keunggulan brand, banner promo musiman terintegrasi DB (`campaigns`), dan grid produk unggulan (*featured*). | ✅ Selesai |
+| **Katalog Produk (Catalog)** | Grid produk dengan pencarian real-time (nama/deskripsi/rasa), filter kategori (*Best Seller, Classic, Spicy Fusion, Cheese Lover, Specialty*), dan filter tingkat kepedasan (*Tanpa Pedas, Level 1–3, Level 4–5*). | ✅ Selesai |
+| **Detail Produk & Pricing** | Galeri foto, informasi komposisi/berat, selektor level pedas interaktif (0–5) dengan update harga instan, *quantity stepper*, rekomendasi produk terkait, dan notifikasi tambah ke keranjang. | ✅ Selesai |
+| **Keranjang Belanja (Cart)** | Manajemen cart di sisi client (`localStorage`), kalkulasi subtotal & total otomatis, form data pembeli (Nama, No. WhatsApp, Alamat, Catatan). | ✅ Selesai |
+| **Database Order Logging** | Penyimpanan instan data transaksi ke tabel `orders` & `order_items` di Supabase dengan pembuatan Kode Pesanan unik (`#SAY-YYMMDD-XXXX`). | ✅ Selesai |
+| **Konfirmasi & WA Dispatch** | Halaman/modal sukses checkout dengan tombol langsung ke WhatsApp Admin membawa Kode Pesanan dan rincian lengkap. | ✅ Selesai |
+| **Cetak Struk PDF (Customer)** | Tombol di halaman sukses bagi pelanggan untuk melihat pratinjau dan mencetak/menyimpan struk digital ke PDF. | ✅ Selesai |
+| **Halaman Profil (About)** | Cerita brand, nilai keunggulan (Kriuk Maksimal, Bumbu Premium, Halal & Higienis), sertifikasi, dan komitmen kualitas. | ✅ Selesai |
+| **Halaman Kontak (Contact)** | Informasi kontak dinamis (WhatsApp, Instagram, Email, Jam Operasional dari `store_settings`), Google Maps embed, dan form pertanyaan langsung ke WhatsApp. | ✅ Selesai |
+| **Theme Switcher** | Dukungan Dark Mode (default) dan Light Mode dengan persistensi preferensi di `localStorage`. | ✅ Selesai |
+| **Dynamic SEO Meta** | Modifikasi dinamis `<title>` dan `<meta description>` untuk setiap rute halaman (`useSEO`). | ✅ Selesai |
+
+### 4.2 Integrasi dengan Sistem Backoffice (`saymac-backoffice`)
+
+| Fitur Terhubung | Deskripsi | Status |
+|---|---|:---:|
+| **Sinkronisasi Katalog Produk** | Mengambil produk aktif dan matriks level prices dari tabel `products` Supabase yang dikelola tim backoffice. | ✅ Selesai |
+| **Sinkronisasi Promo Musiman** | Menampilkan banner kampanye dari tabel `campaigns` yang diaktifkan melalui backoffice. | ✅ Selesai |
+| **Sinkronisasi Kontak Toko** | Mengambil nomor WhatsApp tujuan checkout dari tabel `store_settings`. | ✅ Selesai |
+| **Penyaluran Pesanan ke Backoffice** | Setiap order pelanggan langsung masuk ke tabel `orders` & `order_items` dan dapat diproses di menu *Pesanan Masuk* backoffice. | ✅ Selesai |
+
+---
+
+## 5. Alur Pemesanan Pengguna (Customer Order Flow)
+
+```mermaid
+flowchart TD
+    A[Pelanggan Pilih Produk di Katalog] --> B[Atur Level Pedas & Qty di Detail Produk]
+    B --> C[Tambah ke Keranjang Belanja]
+    C --> D[Buka Keranjang: Isi Nama, No WA, Alamat, Catatan]
+    D --> E[Klik 'Simpan & Pesan via WhatsApp']
+    
+    E --> F[Data Tersimpan ke Database Supabase orders & order_items]
+    F --> G[Sistem Generate Order ID Unik #SAY-YYMMDD-XXXX]
+    G --> H[Tampil Halaman Konfirmasi Pesanan]
+    
+    H -->|Aksi 1: Chat WhatsApp| I[Buka WhatsApp Admin dengan Pesan Terformat & Order ID]
+    H -->|Aksi 2: Cetak Struk| J[Buka Struk Digital & Simpan PDF]
+    
+    F -.->|Real-time Sync| K[Pesanan Otomatis Masuk ke saymac-backoffice]
+```
+
+---
+
+## 6. Format Integrasi Pesan WhatsApp
+
+Pesan yang digenerate oleh sistem pada halaman Keranjang (`Cart.jsx`) dirancang terstruktur dan diarahkan ke nomor `whatsapp_number` dari `store_settings`:
+
+```text
+Halo Say Macaroni, saya ingin mengonfirmasi pesanan saya:
+
+*KODE PESANAN: #SAY-260828-A7K2*
+
+1. Say Macaroni - Garlic Butter (Level Pedas 2) x2 = Rp 52.000
+2. Say Macaroni - Balado Daun Jeruk (Level Pedas 4) x1 = Rp 29.000
+3. Say Macaroni - Original Classic (Tanpa Pedas) x1 = Rp 22.000
+
+*Total Estimasi: Rp 103.000*
+
+*Data Pemesan:*
+- Nama: Budi Santoso
+- No. WhatsApp: 081234567890
+- Alamat: Jl. Melati No. 12, Kebayoran Baru, Jakarta Selatan
+- Catatan: Tolong bumbu daun jeruknya dibanyakin ya kak.
+
+Mohon info ongkir dan petunjuk pembayarannya. Terima kasih!
+```
+
+---
+
+## 7. Skema Data Database (Supabase Schema)
+
+### 7.1 Tabel Pesanan (`public.orders`)
+```sql
+CREATE TABLE public.orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_code TEXT UNIQUE NOT NULL,
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  customer_address TEXT,
+  customer_notes TEXT,
+  total_amount NUMERIC NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'cancelled')),
+  payment_status TEXT NOT NULL DEFAULT 'unpaid' CHECK (payment_status IN ('unpaid', 'paid')),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 7.2 Tabel Item Pesanan (`public.order_items`)
+```sql
+CREATE TABLE public.order_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  product_id TEXT,
+  product_name TEXT NOT NULL,
+  spicy_level INT2 DEFAULT 0,
+  price NUMERIC NOT NULL DEFAULT 0,
+  quantity INT4 NOT NULL DEFAULT 1,
+  subtotal NUMERIC NOT NULL DEFAULT 0,
+  weight TEXT DEFAULT '150g',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+---
+
+## 8. Tech Stack
+
+- **Core:** React 18, Vite (Fast Bundler & HMR)
+- **Styling:** Pure Vanilla CSS (`src/index.css`) dengan CSS Variables, Design Tokens, Glassmorphism, dan `@media print` untuk Struk PDF Pelanggan
+- **Icons:** `lucide-react`
+- **Database / Backend:** Supabase (PostgreSQL, Row Level Security, Storage Bucket)
+- **State Management:** React Context API (`CartContext.jsx`) + `localStorage`
+- **Deployment Platform:** Vercel
+
+---
+
+*Dokumen PRD ini telah diselaraskan dengan implementasi fitur terkini pada repositori `saymac-web` dan `saymac-backoffice`.*

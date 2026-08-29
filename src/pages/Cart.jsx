@@ -1,69 +1,240 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
-import { fetchStoreSettings, DEFAULT_STORE_SETTINGS } from '../services/storeService';
-import { Trash2, Send, ShoppingBag, MapPin, ClipboardList, User } from 'lucide-react';
+import { createOrder } from '../services/orderService';
+import ReceiptModal from '../components/ReceiptModal';
+import {
+  Trash2,
+  Send,
+  ShoppingBag,
+  MapPin,
+  ClipboardList,
+  User,
+  Phone,
+  CheckCircle2,
+  Printer,
+  ArrowRight,
+  Loader2
+} from 'lucide-react';
 
 const Cart = ({ setPage }) => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
 
   // Customer Form State
   const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
-  const [storeSettings, setStoreSettings] = useState(DEFAULT_STORE_SETTINGS);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadSettings() {
-      try {
-        const settings = await fetchStoreSettings();
-        if (isMounted) setStoreSettings(settings);
-      } catch (err) {
-        console.error('Error loading store settings in Cart:', err);
-      }
-    }
-    loadSettings();
-    return () => { isMounted = false; };
-  }, []);
+  // Processing & Success State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
 
-  const handleCheckout = (e) => {
+  // Default WhatsApp Admin Number
+  const WHATSAPP_ADMIN_NUMBER = '6285797987872';
+
+  const handleCheckout = async (e) => {
     e.preventDefault();
 
-    if (cartItems.length === 0) return;
+    if (cartItems.length === 0 || isSubmitting) return;
 
-    // 1. Build Cart Items Text
-    let itemsText = '';
-    cartItems.forEach((item, index) => {
-      const levelText = item.level_pedas === 0 ? 'Tanpa Pedas' : `Level Pedas ${item.level_pedas}`;
-      const subtotal = item.harga * item.quantity;
-      itemsText += `${index + 1}. ${item.nama} (${levelText}) x${item.quantity} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
-    });
+    setIsSubmitting(true);
 
-    // 2. Build Full Message
-    const totalAmount = getCartTotal();
-    const message = `Halo Say Macaroni, saya ingin memesan:
+    try {
+      // 1. Calculate & Save Order to Database (Supabase + Local Fallback)
+      const totalAmount = getCartTotal();
+      const result = await createOrder({
+        customerName,
+        customerPhone,
+        customerAddress,
+        customerNotes,
+        cartItems,
+        totalAmount,
+      });
 
-${itemsText}
-Total: Rp ${totalAmount.toLocaleString('id-ID')}
+      const orderData = result?.order || {
+        order_code: `#SAY-${Date.now().toString().slice(-6)}`,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        customer_notes: customerNotes,
+        total_amount: totalAmount,
+        items: cartItems,
+      };
 
-Nama: ${customerName || '-'}
-Alamat: ${customerAddress || '-'}
-Catatan: ${customerNotes || '-'}
+      setCreatedOrder(orderData);
 
-Mohon info ongkir & total pembayaran. Terima kasih!`;
-
-    // 3. Encode URI
-    const encodedMessage = encodeURIComponent(message);
-    const targetWaNumber = storeSettings.whatsapp_number || '6285797987872';
-    const whatsappUrl = `https://wa.me/${targetWaNumber}?text=${encodedMessage}`;
-
-    // 4. Redirect to WhatsApp
-    window.open(whatsappUrl, '_blank');
-
-    // Optional: Clear cart after checkout redirect
-    // clearCart();
+      // 2. Clear cart items
+      clearCart();
+    } catch (err) {
+      console.error('Error during checkout process:', err);
+      alert('Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  const handleSendToWhatsApp = () => {
+    if (!createdOrder) return;
+
+    let itemsText = '';
+    (createdOrder.items || []).forEach((item, index) => {
+      const levelText = item.spicy_level === 0 || item.level_pedas === 0 ? 'Tanpa Pedas' : `Level Pedas ${item.spicy_level ?? item.level_pedas}`;
+      const itemPrice = item.price || item.harga || 0;
+      const subtotal = itemPrice * (item.quantity || 1);
+      itemsText += `${index + 1}. ${item.product_name || item.nama} (${levelText}) x${item.quantity} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+    });
+
+    const message = `Halo Say Macaroni, saya ingin mengonfirmasi pesanan saya:
+
+*KODE PESANAN: ${createdOrder.order_code}*
+
+${itemsText}
+*Total Estimasi: Rp ${(createdOrder.total_amount || 0).toLocaleString('id-ID')}*
+
+*Data Pemesan:*
+- Nama: ${createdOrder.customer_name || '-'}
+- No. WhatsApp: ${createdOrder.customer_phone || '-'}
+- Alamat: ${createdOrder.customer_address || '-'}
+- Catatan: ${createdOrder.customer_notes || '-'}
+
+Mohon info ongkir dan petunjuk pembayarannya. Terima kasih!`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${WHATSAPP_ADMIN_NUMBER}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // SUCCESS CONFIRMATION VIEW
+  if (createdOrder) {
+    return (
+      <div className="container animate-fade-in" style={{ padding: '60px 24px' }}>
+        <div
+          className="glass-panel"
+          style={{
+            maxWidth: '650px',
+            margin: '0 auto',
+            padding: '40px 32px',
+            borderRadius: 'var(--radius-lg)',
+            textAlign: 'center',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+          }}
+        >
+          {/* Success Badge */}
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background: 'rgba(46, 196, 182, 0.15)',
+              color: '#2ec4b6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+            }}
+          >
+            <CheckCircle2 size={44} />
+          </div>
+
+          <h2 style={{ fontSize: '1.8rem', marginBottom: '8px' }}>Pesanan Berhasil Dicatat!</h2>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginBottom: '24px' }}>
+            Data pesanan Anda telah tersimpan di sistem kami. Silakan lanjutkan konfirmasi ke WhatsApp Admin dan cetak/simpan struk belanja Anda.
+          </p>
+
+          {/* Order Code Box */}
+          <div
+            style={{
+              background: 'rgba(255, 183, 3, 0.08)',
+              border: '1px dashed var(--color-primary)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              marginBottom: '28px',
+            }}
+          >
+            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Kode Pesanan Anda
+            </div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-primary)', marginTop: '4px', letterSpacing: '1px' }}>
+              {createdOrder.order_code}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              Total: <strong>Rp {Number(createdOrder.total_amount || 0).toLocaleString('id-ID')}</strong> ({createdOrder.items?.length || 0} varian)
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <button
+              onClick={handleSendToWhatsApp}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                padding: '14px 24px',
+                fontSize: '1.05rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+              }}
+            >
+              <Send size={18} /> Lanjut Konfirmasi ke WhatsApp Admin
+            </button>
+
+            <button
+              onClick={() => setShowReceiptModal(true)}
+              className="btn"
+              style={{
+                width: '100%',
+                padding: '12px 24px',
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'var(--color-text-main)',
+                border: '1px solid var(--color-border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <Printer size={18} /> Cetak / Simpan Struk PDF
+            </button>
+
+            <button
+              onClick={() => {
+                setCreatedOrder(null);
+                setPage('catalog');
+                window.scrollTo(0, 0);
+              }}
+              className="btn"
+              style={{
+                width: '100%',
+                padding: '10px',
+                fontSize: '0.9rem',
+                color: 'var(--color-text-muted)',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              Belanja Lagi <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Receipt Print / PDF Modal */}
+        {showReceiptModal && (
+          <ReceiptModal order={createdOrder} onClose={() => setShowReceiptModal(false)} />
+        )}
+      </div>
+    );
+  }
+
+  // EMPTY CART VIEW
   if (cartItems.length === 0) {
     return (
       <div className="container animate-fade-in" style={{ padding: '60px 24px', textAlign: 'center' }}>
@@ -214,7 +385,7 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--color-text-muted)' }}>Ongkos Kirim</span>
-                  <span style={{ fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-secondary)' }}>Dihitung oleh Admin</span>
+                  <span style={{ fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-secondary)' }}>Dikonfirmasi oleh Admin via WA</span>
                 </div>
                 <div
                   style={{
@@ -241,13 +412,28 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                 {/* Name */}
                 <div className="input-group" style={{ marginBottom: 0 }}>
                   <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <User size={14} /> Nama Lengkap
+                    <User size={14} /> Nama Lengkap <span style={{ color: 'var(--color-spicy)' }}>*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Masukkan nama Anda..."
+                    placeholder="Masukkan nama pemesan..."
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
+                    className="input-field"
+                    required
+                  />
+                </div>
+
+                {/* WhatsApp Phone Number */}
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                  <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Phone size={14} /> No. WhatsApp Aktif <span style={{ color: 'var(--color-spicy)' }}>*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="Contoh: 081234567890"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
                     className="input-field"
                     required
                   />
@@ -256,10 +442,10 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                 {/* Address */}
                 <div className="input-group" style={{ marginBottom: 0 }}>
                   <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={14} /> Alamat Pengiriman
+                    <MapPin size={14} /> Alamat Pengiriman <span style={{ color: 'var(--color-spicy)' }}>*</span>
                   </label>
                   <textarea
-                    placeholder="Alamat lengkap (nama jalan, RT/RW, kelurahan, kecamatan, kota)..."
+                    placeholder="Alamat lengkap (nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota)..."
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
                     className="input-field"
@@ -275,7 +461,7 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                     <ClipboardList size={14} /> Catatan Tambahan (Opsional)
                   </label>
                   <textarea
-                    placeholder="Contoh: Level 3 pedasnya agak dikurangi, kirim sore hari..."
+                    placeholder="Contoh: Sambal dipisah, kirim setelah jam 2 siang..."
                     value={customerNotes}
                     onChange={(e) => setCustomerNotes(e.target.value)}
                     className="input-field"
@@ -287,6 +473,7 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                 {/* Checkout button */}
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="btn btn-primary"
                   style={{
                     width: '100%',
@@ -298,9 +485,19 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '10px',
+                    opacity: isSubmitting ? 0.7 : 1,
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  <Send size={18} /> Pesan via WhatsApp
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Menyimpan Pesanan...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={18} /> Simpan & Pesan via WhatsApp
+                    </>
+                  )}
                 </button>
               </form>
             </div>
@@ -336,6 +533,13 @@ Mohon info ongkir & total pembayaran. Terima kasih!`;
         }
         .trash-btn:hover {
           color: var(--color-spicy) !important;
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}} />
     </div>
